@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set page = 'accounts' %}
+{% block content %}
+
+<div class="input card">
+  <h1>New Account</h1>
+  <form action="{{ url_for('new_account_handler') }}">
+
+    <span class="input-label">Name</span>
+    <input type="text" name="name" maxlength="255">
+
+    <span class="input-label">Notes</span>
+    <textarea name="notes"></textarea> 
+
+    <button type="submit">
+      <span class="mdi mdi-content-save"></span> Save
+    </button>
+    
+    <a href="{{ url_for('accounts') }}" class="cancel button">
+      <span class="mdi mdi-close"></span> Cancel
+    </a>
+
+  </form>
+</div>
+
+{% endblock %}

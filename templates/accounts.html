@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% set page = 'accounts' %}
+{% block content %}
+
+<div class="card" id="accounts">
+  <h1>Accounts</h1>
+  <table>
+    <!-- <thead>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Notes</th>
+      <th></th>
+      <th></th>
+    </thead> -->
+    <tbody>
+      {% for account in accounts %}
+      <tr>
+          <td>{{ account.id }}</td>
+          <td>{{ account.name }}</td>
+          <td class="stretch">{{ account.notes if account.notes }}</td>
+          <td>
+          <a href="{{ url_for('edit_account', account_id=account.id) }}" title="Edit">
+              <span class="mdi mdi-pencil"></span>
+          </a>
+          </td>
+          <td>
+          <a href="{{ url_for('delete_account_handler', account_id=account.id) }}" title="Delete">
+              <span class="mdi mdi-delete"></span>
+          </a>
+          </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
+  <form action="{{ url_for('new_account') }}">
+    <button type="submit">
+    <span class="mdi mdi-plus"></span> New Account
+    </button>
+  </form>
+</div>
+
+{% endblock %}

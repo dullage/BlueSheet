@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% set page = 'configuration' %}
+{% block content %}
+
+<div class="input card">
+  <h1>Configuration</h1>
+  <form action="{{ url_for('configuration_handler') }}">
+
+    <span class="input-label">Month Start Date</span>
+    <input type="number" name="month_start_date" min="1" max="28" step="1" value="{{ configuration['month_start_date'] }}"><br>
+
+    <span class="input-label">Annual Gross Salary</span>
+    <input type="number" name="annual_gross_salary" min="0" step="1" value="{{ configuration['annual_gross_salary'] }}"><br>
+
+    <span class="input-label">Annual Tax Allowance</span>
+    <input type="number" name="annual_tax_allowance" min="0" step="1" value="{{ configuration['annual_tax_allowance'] }}"><br>
+
+    <span class="input-label">Tax Rate</span>
+    <input type="number" name="tax_rate" min="0" max="100" step="1" value="{{ configuration['tax_rate'] }}"> %<br>
+
+    <span class="input-label">Annual NI Allowance</span>
+    <input type="number" name="annual_ni_allowance" min="0" step="1" value="{{ configuration['annual_ni_allowance'] }}"><br>
+
+    <span class="input-label">NI Rate</span>
+    <input type="number" name="ni_rate" min="0" max="100" step="1" value="{{ configuration['ni_rate'] }}"> %<br>
+
+    <span class="input-label">Annual Non Pensionable Value</span>
+    <input type="number" name="annual_non_pensionable_value" min="0" step="1" value="{{ configuration['annual_non_pensionable_value'] }}"><br>
+
+    <span class="input-label">Pension Contribution</span>
+    <input type="number" name="pension_contribution" min="0" max="100" step="1" value="{{ configuration['pension_contribution'] }}"> %<br>
+        
+    <button type="submit">
+      <span class="mdi mdi-content-save"></span> Save
+    </button>
+
+    <a href="{{ url_for('index') }}" class="cancel button">
+        <span class="mdi mdi-close"></span> Cancel
+    </a>
+
+  </form>
+</div>
+
+{% endblock %}
