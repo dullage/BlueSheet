@@ -11,7 +11,7 @@ body {
 }
 
 .main {
-    margin-left: 250px;
+    margin: 0 0 0 250px;
 }
 
 .card {
@@ -23,22 +23,34 @@ body {
     width: 90%;
 }
 
-.floating-card-wrapper {
-    font-size: 0;
-    text-align: center;
-}
+.grid {
+    background: white;
+    margin: 20px auto 0 auto;
+  }
 
-.floating-card {
-    font-size: medium;
-    text-align: left;
-    display: inline-block;
+.grid:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+  
+ .grid-item {
     width: 500px;
+    /* float: left; */
     background-color: white;
     margin: 40px;
     padding: 30px;
     box-shadow: 0px 6px 40px 0px #e2e2e2;
     border: 1px dashed #f2f7ff;
-}
+  }
+  
+/* .grid-item--width2 { width: 320px; }
+.grid-item--width3 { width: 480px; }
+.grid-item--width4 { width: 640px; }
+
+.grid-item--height2 { height: 200px; }
+.grid-item--height3 { height: 260px; }
+.grid-item--height4 { height: 360px; } */
 
 .input {
     display: table;

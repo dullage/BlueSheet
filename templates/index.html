@@ -2,54 +2,9 @@
 {% set page = 'index' %}
 {% block content %}
 
-<div class="floating-card-wrapper">
+<div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 600, "isFitWidth": true }'>
 
-  <div class="floating-card" id="totals">
-    <h1>Totals</h1>
-    <!-- <p>On the {{ configuration['month_start_date_ordinal'] }} of each month the following amounts need to be transferred into the respective account.</p> -->
-    <table>
-      <tbody>
-        {% for account in accounts %}
-        <tr>
-          <td>{{ account.name }}</td>
-          <td class="stretch bold">£{{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="floating-card" id="totals">
-    <h1>Totals</h1>
-    <p>On the {{ configuration['month_start_date_ordinal'] }} of each month the following amounts need to be transferred into the respective account.</p>
-    <table>
-      <tbody>
-        {% for account in accounts %}
-        <tr>
-          <td>{{ account.name }}</td>
-          <td class="stretch bold">£{{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="floating-card" id="totals">
-    <h1>Totals</h1>
-    <p>On the {{ configuration['month_start_date_ordinal'] }} of each month the following amounts need to be transferred into the respective account.</p>
-    <table>
-      <tbody>
-        {% for account in accounts %}
-        <tr>
-          <td>{{ account.name }}</td>
-          <td class="stretch bold">£{{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="floating-card" id="totals">
+  <div class="grid-item" id="totals">
     <h1>Totals</h1>
     <p>On the {{ configuration['month_start_date_ordinal'] }} of each month the following amounts need to be transferred into the respective account.</p>
     <table>
