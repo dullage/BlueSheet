@@ -5,6 +5,7 @@ from helpers import ordinal, empty_strings_to_none
 from spending import calculations
 from datetime import datetime, timedelta
 from os import environ, path
+from starlingbank import StarlingAccount
 
 # Basic brute force prevent, see User class.
 if path.isfile("LOCK"):
@@ -63,6 +64,16 @@ class User(db.Model):
             self.configuration.month_end_date,
             self.configuration.weekly_pay_day
         )
+
+    @property
+    def starling_account(self):
+        if self.configuration.starling_api_key is None:
+            return None
+        else:
+            return StarlingAccount(
+                self.configuration.starling_api_key,
+                update=True
+            )
 
     @classmethod
     def login(cls, username, password, session):

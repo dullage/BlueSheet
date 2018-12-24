@@ -139,7 +139,10 @@ body {
     background-color: #346753;
 }
 #weekly-spending-money-outgoings-grid-item {
-    background-color: #1995AD;
+    background-color: rgb(123,197,246);
+}
+#starling-account-grid-item {
+    background-color: rgb(46,72,126)
 }
   
 /* .grid-item--width2 { width: 320px; }
@@ -201,7 +204,7 @@ h1 {
 }
 
 h2 {
-    margin: 0 0 8px 0;
+    margin: 20px 0 8px 0;
 }
 
 p {

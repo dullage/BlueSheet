@@ -112,8 +112,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Custom
 .vscode/settings.json
-BlueSheet.db
+*.db
 BlueSheet.url
 notes.txt
 test.py
