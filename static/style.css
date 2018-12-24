@@ -41,6 +41,11 @@
     opacity: 0.1;
     z-index: -1;
 }
+@media screen and (max-width: 800px) {
+    .login-outer img {
+        width: 300%;
+    }
+}
 
 .login-logo-name {
     font-size: 60px;
@@ -299,16 +304,4 @@ textarea {
 .navbar li a.current-page {
     color: white;
     font-weight: bold;
-}
-
-@media screen and (max-width: 500px) {
-    .navbar a {
-        float: none;
-        display: block;
-    }
-
-    .card {
-        background: black;
-        margin: 0;
-    }
 }
