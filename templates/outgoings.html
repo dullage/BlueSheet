@@ -2,7 +2,7 @@
 {% set page = 'outgoings' %}
 {% block content %}
 
-{% for account in accounts %}
+{% for account in user.accounts %}
 <div class="card" id="outgoings">
   <h1>{{ account.name }}</h1>
   <table class="alternating">

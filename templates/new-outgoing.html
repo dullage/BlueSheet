@@ -4,11 +4,11 @@
 
 <div class="input card">
   <h1>New Outgoing</h1>
-  <form action="{{ url_for('new_outgoing_handler') }}">
+  <form action="{{ url_for('new_outgoing_handler') }}" method="POST">
 
     <span class="input-label">Account</span>
     <select name="account_id" required>
-      {% for account in accounts %}
+      {% for account in user.accounts %}
         <option value="{{ account.id }}" {% if account.id == account_id|int %}selected{% endif %}>{{ account.name }}</option>
       {% endfor %}
     </select>

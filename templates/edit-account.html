@@ -4,7 +4,7 @@
 
 <div class="input card">
   <h1>Edit {{ account.name }}</h1>
-  <form action="{{ url_for('edit_account_handler', account_id = account.id) }}">
+  <form action="{{ url_for('edit_account_handler', account_id = account.id) }}" method="POST">
 
     <span class="input-label">Name</span>
     <input type="text" name="name" minlength="1" maxlength="255" value="{{ account.name }}" required>

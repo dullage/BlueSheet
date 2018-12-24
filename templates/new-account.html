@@ -4,7 +4,7 @@
 
 <div class="input card">
   <h1>New Account</h1>
-  <form action="{{ url_for('new_account_handler') }}">
+  <form action="{{ url_for('new_account_handler') }}" method="POST">
 
     <span class="input-label">Name</span>
     <input type="text" name="name" minlength="1" maxlength="255" required>

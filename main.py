@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from helpers import ordinal
+from helpers import ordinal, empty_strings_to_none
 from spending import calculations
 from datetime import datetime, timedelta
 from os import environ, path
@@ -13,16 +13,10 @@ if path.isfile("LOCK"):
 DATABASE_PATH = environ.get('DATABASE_PATH', 'BlueSheet.db')
 SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
 
-CONFIGURATION_NAMES = [
-    'month_start_date',
-    'weekly_pay_day',
-    'weekly_spending_amount'
-]
-
 app = Flask(__name__)
-
 app.secret_key = b'bg31HxAIUmxAI'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+
 db = SQLAlchemy(app)
 
 
@@ -34,11 +28,41 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
+    configuration = db.relationship(
+        "Configuration",
+        backref="configuration",
+        uselist=False,
+        lazy=True
+    )
+    salary = db.relationship(
+        "Salary",
+        backref="salary",
+        uselist=False,
+        lazy=True
+    )
+    accounts = db.relationship("Account", backref="account", lazy=True)
+    outgoings = db.relationship("Outgoing", backref="outgoings", lazy=True)
 
     def __init__(self, username, password):
         self.id - id
         self.username = username
         self.password = password
+
+    @property
+    def total_outgoings(self):
+        total_outgoings = 0
+        for outgoing in self.outgoings:
+            total_outgoings = total_outgoings + outgoing.value
+        return total_outgoings
+
+    @property
+    def weekly_spending_calculations(self):
+        return calculations(
+            self.configuration.weekly_spending_amount,
+            self.configuration.month_start_date,
+            self.configuration.month_end_date,
+            self.configuration.weekly_pay_day
+        )
 
     @classmethod
     def login(cls, username, password, session):
@@ -59,14 +83,14 @@ class User(db.Model):
             else:
                 return False
         else:
-            session['username'] = user.username
+            session['user_id'] = user.id
             session['last_activity'] = \
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return user
 
     @classmethod
     def login_required(cls, session):
-        if 'username' not in session:
+        if 'user_id' not in session:
             return True
         if 'last_activity' not in session:
             return True
@@ -78,37 +102,64 @@ class User(db.Model):
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return False
 
+    def configuration_required(self):
+        if self.configuration is None:
+            return True
+        else:
+            return False
+
 
 class Configuration(db.Model):
     __tablename__ = "configuration"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False, unique=True)
-    value = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        unique=True,
+        nullable=False
+    )
+    month_start_date = db.Column(db.Integer, nullable=False)
+    weekly_pay_day = db.Column(db.Integer, nullable=False)
+    weekly_spending_amount = db.Column(db.Numeric, nullable=False)
+    starling_api_key = db.Column(db.String(255))
 
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
+    def __init__(
+        self,
+        user_id,
+        month_start_date,
+        weekly_pay_day,
+        weekly_spending_amount,
+        starling_api_key=None
+    ):
+        self.user_id = user_id
+        self.month_start_date = month_start_date
+        self.weekly_pay_day = weekly_pay_day
+        self.weekly_spending_amount = weekly_spending_amount
+        self.starling_api_key = starling_api_key
 
-    @classmethod
-    def get(cls):
-        configuration_data = Configuration.query.all()
-        configuration = {}
+    @property
+    def month_start_date_ordinal(self):
+        return ordinal(self.month_start_date)
 
-        for entry in configuration_data:
-            configuration[entry.name] = entry.value
-
-            if entry.name == "month_start_date":
-                configuration["month_start_date_ordinal"] = \
-                    ordinal(int(entry.value))
-
-        return configuration
+    @property
+    def month_end_date(self):
+        if self.month_start_date == 1:
+            return 28
+        else:
+            return self.month_start_date - 1
 
 
 class Salary(db.Model):
     __tablename__ = "salary"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        unique=True,
+        nullable=False
+    )
     annual_gross_salary = db.Column(db.Numeric, nullable=False)
     annual_tax_allowance = db.Column(db.Numeric, nullable=False)
     tax_rate = db.Column(db.Numeric, nullable=False)
@@ -119,6 +170,7 @@ class Salary(db.Model):
 
     def __init__(
         self,
+        user_id,
         annual_gross_salary,
         annual_tax_allowance,
         tax_rate,
@@ -127,6 +179,7 @@ class Salary(db.Model):
         annual_non_pensionable_value,
         pension_contribution
     ):
+        self.user_id = user_id
         self.annual_gross_salary = annual_gross_salary
         self.annual_tax_allowance = annual_tax_allowance
         self.tax_rate = tax_rate
@@ -168,11 +221,13 @@ class Account(db.Model):
     __tablename__ = "account"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     notes = db.Column(db.String(8000))
     outgoings = db.relationship("Outgoing", backref="account", lazy=True)
 
-    def __init__(self, name, notes=None):
+    def __init__(self, user_id, name, notes=None):
+        self.user_id = user_id
         self.name = name
         self.notes = notes
 
@@ -181,6 +236,7 @@ class Outgoing(db.Model):
     __tablename__ = "outgoing"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     value = db.Column(db.Numeric, nullable=False)
     account_id = db.Column(
@@ -190,32 +246,19 @@ class Outgoing(db.Model):
     )
     notes = db.Column(db.String(8000))
 
-    def __init__(self, name, value, account_id, notes=None):
+    def __init__(self, user_id, name, value, account_id, notes=None):
+        self.user_id = user_id
         self.name = name
         self.value = value
         self.account_id = account_id
         self.notes = notes
 
-    @classmethod
-    def total(cls):
-        all_outgoings = cls.query.all()
-        total_outgoings = 0
-        for outgoing in all_outgoings:
-            total_outgoings = total_outgoings + outgoing.value
-
-        return total_outgoings
-
 
 db.create_all()
-
-# Initialise a Salary row
-salary_count = Salary.query.count()
-if salary_count == 0:
-    db.session.add(Salary(1, 1, 1, 1, 1, 1, 1))
-    db.session.commit()
 # endregion
 
 
+# region Routes
 # region Login
 @app.route("/login")
 def login():
@@ -226,7 +269,7 @@ def login():
     )
 
 
-@app.route("/login-handler", methods=['post'])
+@app.route("/login-handler", methods=['POST'])
 def login_handler():
     user = User.login(
         request.form['username'],
@@ -253,31 +296,14 @@ def logout():
 def index():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    configuration = Configuration.get()
-
-    # region NASTY
-    if configuration['month_start_date'] == "1":
-        month_end_date = 28
-    else:
-        month_end_date = int(configuration['month_start_date']) - 1
-
-    weekly_spending_calculations = calculations(
-        int(configuration['weekly_spending_amount']),
-        int(configuration['month_start_date']),
-        month_end_date,
-        int(configuration['weekly_pay_day'])
-    )
-    # endregion
+    if user.configuration_required():
+        return redirect(url_for('configuration'))
 
     return render_template(
         'index.html',
-        accounts=Account.query.order_by(Account.id).all(),
-        outgoings=Outgoing.query.order_by(Outgoing.id).all(),
-        total_outgoings=Outgoing.total(),
-        salary=Salary.query.first(),
-        configuration=configuration,
-        weekly_spending_calculations=weekly_spending_calculations
+        user=user
     )
 # endregion
 
@@ -287,10 +313,11 @@ def index():
 def accounts():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     return render_template(
         'accounts.html',
-        accounts=Account.query.order_by(Account.id).all(),
+        user=user
     )
 
 
@@ -302,18 +329,21 @@ def new_account():
     return render_template('new-account.html')
 
 
-@app.route("/new-account-handler")
+@app.route("/new-account-handler", methods=['POST'])
 def new_account_handler():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    name = request.args.get("name")
-    notes = request.args.get("notes")
-    if notes == "":
-        notes = None
+    form_data = empty_strings_to_none(request.form)
 
-    db.session.add(Account(name, notes=notes))
+    db.session.add(Account(
+        user.id,
+        form_data['name'],
+        form_data['notes']
+    ))
     db.session.commit()
+
     return redirect(url_for('accounts'))
 
 
@@ -322,25 +352,26 @@ def edit_account(account_id):
     if User.login_required(session):
         return redirect(url_for('login'))
 
-    account = Account.query.get(account_id)
-    return render_template('edit-account.html', account=account)
+    return render_template(
+        'edit-account.html',
+        account=Account.query.get(account_id)
+    )
 
 
-@app.route("/edit-account-handler/<account_id>")
+@app.route("/edit-account-handler/<account_id>", methods=['POST'])
 def edit_account_handler(account_id):
     if User.login_required(session):
         return redirect(url_for('login'))
 
-    name = request.args.get("name")
-    notes = request.args.get("notes")
-    if notes == "":
-        notes = None
+    form_data = empty_strings_to_none(request.form)
 
     account = Account.query.get(account_id)
-    account.name = name
-    account.notes = notes
+
+    account.name = form_data['name']
+    account.notes = form_data['notes']
 
     db.session.commit()
+
     return redirect(url_for('accounts'))
 
 
@@ -350,9 +381,11 @@ def delete_account_handler(account_id):
         return redirect(url_for('login'))
 
     account = Account.query.get(account_id)
+
     db.session.delete(account)
 
     db.session.commit()
+
     return redirect(url_for('accounts'))
 # endregion
 
@@ -362,10 +395,11 @@ def delete_account_handler(account_id):
 def outgoings():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     return render_template(
         'outgoings.html',
-        accounts=Account.query.order_by(Account.id).all()
+        user=user
     )
 
 
@@ -373,29 +407,34 @@ def outgoings():
 def new_outgoing():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     account_id = request.args.get("account_id")
+
     return render_template(
         'new-outgoing.html',
-        account_id=account_id,
-        accounts=Account.query.order_by(Account.id).all()
+        user=user,
+        account_id=account_id
     )
 
 
-@app.route("/new-outgoing-handler")
+@app.route("/new-outgoing-handler", methods=['POST'])
 def new_outgoing_handler():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    account_id = request.args.get("account_id")
-    name = request.args.get("name")
-    value = request.args.get("value")
-    notes = request.args.get("notes")
-    if notes == "":
-        notes = None
+    form_data = empty_strings_to_none(request.form)
 
-    db.session.add(Outgoing(name, value, account_id, notes=notes))
+    db.session.add(Outgoing(
+        user.id,
+        form_data['name'],
+        form_data['value'],
+        form_data['account_id'],
+        form_data['notes']
+    ))
     db.session.commit()
+
     return redirect(url_for('outgoings'))
 
 
@@ -403,34 +442,31 @@ def new_outgoing_handler():
 def edit_outgoing(outgoing_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    outgoing = Outgoing.query.get(outgoing_id)
     return render_template(
         'edit-outgoing.html',
-        accounts=Account.query.order_by(Account.id).all(),
-        outgoing=outgoing
+        user=user,
+        outgoing=Outgoing.query.get(outgoing_id)
     )
 
 
-@app.route("/edit-outgoing-handler/<outgoing_id>")
+@app.route("/edit-outgoing-handler/<outgoing_id>", methods=['POST'])
 def edit_outgoing_handler(outgoing_id):
     if User.login_required(session):
         return redirect(url_for('login'))
 
-    account_id = request.args.get("account_id")
-    name = request.args.get("name")
-    value = request.args.get("value")
-    notes = request.args.get("notes")
-    if notes == "":
-        notes = None
+    form_data = empty_strings_to_none(request.form)
 
     outgoing = Outgoing.query.get(outgoing_id)
-    outgoing.account_id = account_id
-    outgoing.name = name
-    outgoing.value = value
-    outgoing.notes = notes
+
+    outgoing.account_id = form_data['account_id']
+    outgoing.name = form_data['name']
+    outgoing.value = form_data['value']
+    outgoing.notes = form_data['notes']
 
     db.session.commit()
+
     return redirect(url_for('outgoings'))
 
 
@@ -440,9 +476,11 @@ def delete_outgoing_handler(outgoing_id):
         return redirect(url_for('login'))
 
     outgoing = Outgoing.query.get(outgoing_id)
+
     db.session.delete(outgoing)
 
     db.session.commit()
+
     return redirect(url_for('outgoings'))
 # endregion
 
@@ -452,41 +490,60 @@ def delete_outgoing_handler(outgoing_id):
 def configuration():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     return render_template(
         'configuration.html',
-        configuration=Configuration.get(),
-        salary=Salary.query.first()
+        user=user
     )
 
 
-@app.route("/configuration-handler")
+@app.route("/configuration-handler", methods=['POST'])
 def configuration_handler():
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    # Create a dict of the configuration objects
-    configuration = {}
-    for obj in Configuration.query.all():
-        configuration[obj.name] = obj
+    form_data = empty_strings_to_none(request.form)
 
-    salary = Salary.query.first()
+    if user.configuration is None:
+        db.session.add(Configuration(
+            user.id,
+            form_data['month_start_date'],
+            form_data['weekly_pay_day'],
+            form_data['weekly_spending_amount'],
+            form_data['starling_api_key']
+        ))
+    else:
+        user.configuration.month_start_date = form_data['month_start_date']
+        user.configuration.weekly_pay_day = form_data['weekly_pay_day']
+        user.configuration.weekly_spending_amount \
+            = form_data['weekly_spending_amount']
+        user.configuration.starling_api_key = form_data['starling_api_key']
 
-    # Update / Add All
-    for arg, value in request.args.items():
-        # Configuration Item
-        if arg in CONFIGURATION_NAMES:
-            try:
-                configuration[arg].value = value
-            except KeyError:
-                db.session.add(Configuration(arg, value))
-        # Salary Item
-        else:
-            try:
-                setattr(salary, arg, value)
-            except AttributeError:
-                pass
+    if user.salary is None:
+        db.session.add(Salary(
+            user.id,
+            form_data['annual_gross_salary'],
+            form_data['annual_tax_allowance'],
+            form_data['tax_rate'],
+            form_data['annual_ni_allowance'],
+            form_data['ni_rate'],
+            form_data['annual_non_pensionable_value'],
+            form_data['pension_contribution']
+        ))
+    else:
+        user.salary.annual_gross_salary = form_data['annual_gross_salary']
+        user.salary.annual_tax_allowance = form_data['annual_tax_allowance']
+        user.salary.tax_rate = form_data['tax_rate']
+        user.salary.annual_ni_allowance = form_data['annual_ni_allowance']
+        user.salary.ni_rate = form_data['ni_rate']
+        user.salary.annual_non_pensionable_value \
+            = form_data['annual_non_pensionable_value']
+        user.salary.pension_contribution = form_data['pension_contribution']
 
     db.session.commit()
-    return redirect(url_for(request.args.get('return_page', 'index')))
+
+    return redirect(url_for(form_data.get('return_page', 'index')))
+# endregion
 # endregion

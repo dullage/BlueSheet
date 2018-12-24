@@ -4,57 +4,62 @@
 
 <div class="input card">
   <h1>Configuration</h1>
-  <form action="{{ url_for('configuration_handler') }}">
+  <form action="{{ url_for('configuration_handler') }}" method="POST">
 
     <h2>Pay Dates</h2>
     <span class="input-label">Month Start Date</span>
     <input type="number" name="month_start_date" min="1" max="28" step="1" 
-      value="{{ configuration['month_start_date'] }}" required><br>
+      value="{{ user.configuration.month_start_date }}" required><br>
 
     <span class="input-label">Weekly Pay Day</span>
     <select name="weekly_pay_day" required>
-        <option value="0" {% if configuration['weekly_pay_day'] == '0' %}selected{% endif %}>Monday</option>
-        <option value="1" {% if configuration['weekly_pay_day'] == '1' %}selected{% endif %}>Tuesday</option>
-        <option value="2" {% if configuration['weekly_pay_day'] == '2' %}selected{% endif %}>Wednesday</option>
-        <option value="3" {% if configuration['weekly_pay_day'] == '3' %}selected{% endif %}>Thursday</option>
-        <option value="4" {% if configuration['weekly_pay_day'] == '4' %}selected{% endif %}>Friday</option>
-        <option value="5" {% if configuration['weekly_pay_day'] == '5' %}selected{% endif %}>Saturday</option>
-        <option value="6" {% if configuration['weekly_pay_day'] == '6' %}selected{% endif %}>Sunday</option>
+        <option value="0" {% if user.configuration.weekly_pay_day == '0' %}selected{% endif %}>Monday</option>
+        <option value="1" {% if user.configuration.weekly_pay_day == '1' %}selected{% endif %}>Tuesday</option>
+        <option value="2" {% if user.configuration.weekly_pay_day == '2' %}selected{% endif %}>Wednesday</option>
+        <option value="3" {% if user.configuration.weekly_pay_day == '3' %}selected{% endif %}>Thursday</option>
+        <option value="4" {% if user.configuration.weekly_pay_day == '4' %}selected{% endif %}>Friday</option>
+        <option value="5" {% if user.configuration.weekly_pay_day == '5' %}selected{% endif %}>Saturday</option>
+        <option value="6" {% if user.configuration.weekly_pay_day == '6' %}selected{% endif %}>Sunday</option>
     </select>
 
     <span class="input-label">Weekly Spending Amount</span>
     £ <input type="number" name="weekly_spending_amount" min="0" step="0.01" 
-      value="{{ configuration['weekly_spending_amount'] }}" required><br>
+      value="{{ user.configuration.weekly_spending_amount }}" required><br>
 
     <h2>Salary</h2>
     <span class="input-label">Annual Gross Salary</span>
     £ <input type="number" name="annual_gross_salary" min="0" step="1" 
-      value="{{ '{:.0f}'.format(salary.annual_gross_salary) }}" required><br>
+      value="{{ '{:.0f}'.format(user.salary.annual_gross_salary) if user.salary.annual_gross_salary }}" required><br>
 
     <span class="input-label">Annual Tax Allowance</span>
     £ <input type="number" name="annual_tax_allowance" min="0" step="1" 
-      value="{{ '{:.0f}'.format(salary.annual_tax_allowance) }}" required><br>
+      value="{{ '{:.0f}'.format(user.salary.annual_tax_allowance) if user.salary.annual_tax_allowance }}" required><br>
 
     <span class="input-label">Tax Rate</span>
     <input type="number" name="tax_rate" min="0" max="100" step="1" 
-      value="{{ '{:.0f}'.format(salary.tax_rate) }}" required> %<br>
+      value="{{ '{:.0f}'.format(user.salary.tax_rate) if user.salary.tax_rate }}" required> %<br>
 
     <span class="input-label">Annual NI Allowance</span>
     £ <input type="number" name="annual_ni_allowance" min="0" step="1" 
-      value="{{ '{:.0f}'.format(salary.annual_ni_allowance) }}" required><br>
+      value="{{ '{:.0f}'.format(user.salary.annual_ni_allowance) if user.salary.annual_ni_allowance }}" required><br>
 
     <span class="input-label">NI Rate</span>
     <input type="number" name="ni_rate" min="0" max="100" step="1" 
-      value="{{ '{:.0f}'.format(salary.ni_rate) }}" required> %<br>
+      value="{{ '{:.0f}'.format(user.salary.ni_rate) if user.salary.ni_rate }}" required> %<br>
 
     <span class="input-label">Annual Non Pensionable Value</span>
     £ <input type="number" name="annual_non_pensionable_value" min="0" step="1" 
-      value="{{ '{:.0f}'.format(salary.annual_non_pensionable_value) }}" required><br>
+      value="{{ '{:.0f}'.format(user.salary.annual_non_pensionable_value) if user.salary.annual_non_pensionable_value }}" required><br>
 
     <span class="input-label">Pension Contribution</span>
     <input type="number" name="pension_contribution" min="0" max="100" step="1" 
-      value="{{ '{:.0f}'.format(salary.pension_contribution) }}" required> %<br>
-        
+      value="{{ '{:.0f}'.format(user.salary.pension_contribution) if user.salary.pension_contribution }}" required> %
+    
+    <h2>Starling Integration</h2>
+    <span class="input-label">API Key</span>
+    <input type="text" name="starling_api_key" value="{{ user.configuration.starling_api_key if user.configuration.starling_api_key }}">
+    
+    <br>
     <input type="hidden" value="{{ request.args.get('return_page', 'index') }}" name="return_page" />
     <button type="submit">
       <span class="mdi mdi-content-save"></span> Save
