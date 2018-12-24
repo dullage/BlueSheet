@@ -6,35 +6,61 @@
   <h1>Configuration</h1>
   <form action="{{ url_for('configuration_handler') }}">
 
+    <h2>Pay Dates</h2>
     <span class="input-label">Month Start Date</span>
-    <input type="number" name="month_start_date" min="1" max="28" step="1" value="{{ configuration['month_start_date'] }}"><br>
+    <input type="number" name="month_start_date" min="1" max="28" step="1" 
+      value="{{ configuration['month_start_date'] }}" required><br>
 
+    <span class="input-label">Weekly Pay Day</span>
+    <select name="weekly_pay_day" required>
+        <option value="0" {% if configuration['weekly_pay_day'] == '0' %}selected{% endif %}>Monday</option>
+        <option value="1" {% if configuration['weekly_pay_day'] == '1' %}selected{% endif %}>Tuesday</option>
+        <option value="2" {% if configuration['weekly_pay_day'] == '2' %}selected{% endif %}>Wednesday</option>
+        <option value="3" {% if configuration['weekly_pay_day'] == '3' %}selected{% endif %}>Thursday</option>
+        <option value="4" {% if configuration['weekly_pay_day'] == '4' %}selected{% endif %}>Friday</option>
+        <option value="5" {% if configuration['weekly_pay_day'] == '5' %}selected{% endif %}>Saturday</option>
+        <option value="6" {% if configuration['weekly_pay_day'] == '6' %}selected{% endif %}>Sunday</option>
+    </select>
+
+    <span class="input-label">Weekly Spending Amount</span>
+    £ <input type="number" name="weekly_spending_amount" min="0" step="0.01" 
+      value="{{ configuration['weekly_spending_amount'] }}" required><br>
+
+    <h2>Salary</h2>
     <span class="input-label">Annual Gross Salary</span>
-    <input type="number" name="annual_gross_salary" min="0" step="1" value="{{ configuration['annual_gross_salary'] }}"><br>
+    £ <input type="number" name="annual_gross_salary" min="0" step="1" 
+      value="{{ '{:.0f}'.format(salary.annual_gross_salary) }}" required><br>
 
     <span class="input-label">Annual Tax Allowance</span>
-    <input type="number" name="annual_tax_allowance" min="0" step="1" value="{{ configuration['annual_tax_allowance'] }}"><br>
+    £ <input type="number" name="annual_tax_allowance" min="0" step="1" 
+      value="{{ '{:.0f}'.format(salary.annual_tax_allowance) }}" required><br>
 
     <span class="input-label">Tax Rate</span>
-    <input type="number" name="tax_rate" min="0" max="100" step="1" value="{{ configuration['tax_rate'] }}"> %<br>
+    <input type="number" name="tax_rate" min="0" max="100" step="1" 
+      value="{{ '{:.0f}'.format(salary.tax_rate) }}" required> %<br>
 
     <span class="input-label">Annual NI Allowance</span>
-    <input type="number" name="annual_ni_allowance" min="0" step="1" value="{{ configuration['annual_ni_allowance'] }}"><br>
+    £ <input type="number" name="annual_ni_allowance" min="0" step="1" 
+      value="{{ '{:.0f}'.format(salary.annual_ni_allowance) }}" required><br>
 
     <span class="input-label">NI Rate</span>
-    <input type="number" name="ni_rate" min="0" max="100" step="1" value="{{ configuration['ni_rate'] }}"> %<br>
+    <input type="number" name="ni_rate" min="0" max="100" step="1" 
+      value="{{ '{:.0f}'.format(salary.ni_rate) }}" required> %<br>
 
     <span class="input-label">Annual Non Pensionable Value</span>
-    <input type="number" name="annual_non_pensionable_value" min="0" step="1" value="{{ configuration['annual_non_pensionable_value'] }}"><br>
+    £ <input type="number" name="annual_non_pensionable_value" min="0" step="1" 
+      value="{{ '{:.0f}'.format(salary.annual_non_pensionable_value) }}" required><br>
 
     <span class="input-label">Pension Contribution</span>
-    <input type="number" name="pension_contribution" min="0" max="100" step="1" value="{{ configuration['pension_contribution'] }}"> %<br>
+    <input type="number" name="pension_contribution" min="0" max="100" step="1" 
+      value="{{ '{:.0f}'.format(salary.pension_contribution) }}" required> %<br>
         
+    <input type="hidden" value="{{ request.args.get('return_page', 'index') }}" name="return_page" />
     <button type="submit">
       <span class="mdi mdi-content-save"></span> Save
     </button>
 
-    <a href="{{ url_for('index') }}" class="cancel button">
+    <a href="{{ url_for(request.args.get('return_page', 'index')) }}" class="cancel button">
         <span class="mdi mdi-close"></span> Cancel
     </a>
 

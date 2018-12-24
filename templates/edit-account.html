@@ -7,7 +7,7 @@
   <form action="{{ url_for('edit_account_handler', account_id = account.id) }}">
 
     <span class="input-label">Name</span>
-    <input type="text" name="name" maxlength="255" value="{{ account.name }}">
+    <input type="text" name="name" minlength="1" maxlength="255" value="{{ account.name }}" required>
     
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ account.notes if account.notes }}</textarea>

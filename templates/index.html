@@ -4,19 +4,86 @@
 
 <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 600, "isFitWidth": true }'>
 
-  <div class="grid-item" id="totals">
-    <h1>Totals</h1>
+  <div class="grid-item">
+    <h1>Outgoings</h1>
+    <!-- <div style="background-color: peru; height: 3px; width: 33%; color: peru; margin: 0 0 8px 0;">|</div> -->
+    <hr id="outgoings-grid-item">
     <p>On the {{ configuration['month_start_date_ordinal'] }} of each month the following amounts need to be transferred into the respective account.</p>
     <table>
       <tbody>
         {% for account in accounts %}
         <tr>
           <td>{{ account.name }}</td>
-          <td class="stretch bold">£{{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
+          <td>£ {{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
         </tr>
         {% endfor %}
+        <tr><td><br></td></tr>
+        <tr>
+          <td class="bold">Total Outgoings</td>
+          <td class="bold">£ {{ "{:.2f}".format(total_outgoings) }}</td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="grid-item">
+    <h1>Monthly Salary</h1>
+    <hr id="monthly-salary-grid-item">
+    <p>The current pay period started on {{ weekly_spending_calculations['current_month_start_date'] }} 
+      and ends on {{ weekly_spending_calculations['current_month_end_date'] }}.</p>
+    <table>
+      <tbody>
+        <tr>
+          <td class="bold">Gross Salary</td>
+          <td class="bold">£ {{ "{:,.2f}".format(salary.annual_gross_salary / 12) }}</td>
+        </tr>
+        <tr>
+          <td>Tax</td>
+          <td>- £ {{ "{:,.2f}".format(salary.annual_tax / 12) }}</td>
+        </tr>
+        <tr>
+          <td>National Insurance</td>
+          <td>- £ {{ "{:,.2f}".format(salary.annual_ni / 12) }}</td>
+        </tr>
+        <tr>
+          <td>Pension Contributions</td>
+          <td>- £ {{ "{:,.2f}".format(salary.annual_pension / 12) }}</td>
+        </tr>
+        <tr>
+          <td>Pension Tax Relief</td>
+          <td>+ £ {{ "{:,.2f}".format(salary.annual_pension_tax_relief / 12) }}</td>
+        </tr>
+        <tr><td><br></td></tr>
+        <tr>
+          <td class="bold">Net Salary</td>
+          <td class="bold">£ {{ "{:,.2f}".format(salary.annual_net_salary / 12) }}</td>
+        </tr>
+        <tr>
+          <td class="bold">After Outgoings</td>
+          <td class="bold">£ {{ "{:,.2f}".format((salary.annual_net_salary / 12) - total_outgoings) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-item">
+    <h1>Weekly Spending Money</h1>
+    <hr id="weekly-spending-money-outgoings-grid-item">
+    <table>
+      <tbody>
+        <tr>
+          <td class="bold">Set</td>
+          <td class="bold">£ {{ "{:.2f}".format(configuration['weekly_spending_amount'] | int) }}</td>
+        </tr>
+        <tr>
+          <td>Available</td>
+          <td>£ {{ "{:.2f}".format(((salary.annual_net_salary) - (total_outgoings * 12)) / 52) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <p>To cover future spending money the spending money savings goal should 
+      currently total £{{ "{:,.2f}".format(weekly_spending_calculations['goal_target']) }}.</p>
   </div>
 
 </div>

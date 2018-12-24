@@ -21,7 +21,7 @@
   <meta name="theme-color" content="#ffffff">
 
   <link rel="stylesheet" href="//cdn.materialdesignicons.com/3.2.89/css/materialdesignicons.min.css">
-  <link href="https://fonts.googleapis.com/css?family=Assistant|Lato" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
   <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
@@ -43,18 +43,15 @@
           <span class="mdi mdi-currency-gbp"></span>Outgoings
       </a></li>
       <!-- <li><a href="{{ url_for('index') }}">Pension / Savings</a></li> -->
-      <li><a href="{{ url_for('configuration') }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
-        <span class="mdi mdi-settings"></span>Configuration
+
+      <li><a href="{{ url_for('configuration', return_page=page) }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
+          <span class="mdi mdi-settings"></span>Configuration
+        </a></li>
+      <li><a href="{{ url_for('logout') }}">
+        <span class="mdi mdi-logout-variant"></span>Logout
       </a></li>
     </ul>
   </div>
-  <!-- <div class="bottom navbar">
-    <ul>
-      <li><a href="{{ url_for('configuration') }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
-        <span class="mdi mdi-settings"></span>Configuration
-      </a></li>
-    </ul>
-  </div> -->
 
   <div class="main">
     {% block content %}

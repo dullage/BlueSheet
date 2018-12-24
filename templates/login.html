@@ -1,0 +1,48 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <title>BlueSheet</title>
+
+  <meta name="description" content="Personal & Household Finance Planning.">
+  <meta name="author" content="Adam Dullage">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+  <link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#425979">
+  <meta name="msapplication-TileColor" content="#2b5797">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="stylesheet" href="//cdn.materialdesignicons.com/3.2.89/css/materialdesignicons.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="login-outer">
+  <img src="{{ url_for('static', filename='robert-bye-182304-unsplash.jpg') }}">
+  <div class="login-middle">
+    <div class="login-inner">
+      <span class="mdi mdi-monitor-dashboard login-logo"></span><br>
+      <span class="login-logo-name">BlueSheet</span>
+      <form action="{{ url_for('login_handler') }}" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" style="display: none;">
+          <span class="mdi mdi-login-variant"></span> Login
+        </button>
+      </form>
+      <span class="login-message">{{ message if message }}</span>
+    </div>
+  </div>
+
+</body>
+
+</html>

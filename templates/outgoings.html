@@ -5,7 +5,7 @@
 {% for account in accounts %}
 <div class="card" id="outgoings">
   <h1>{{ account.name }}</h1>
-  <table>
+  <table class="alternating">
     <tbody>
       {% for outgoing in account.outgoings %}
       <tr>

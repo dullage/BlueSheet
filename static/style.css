@@ -5,7 +5,84 @@
     padding: 0; 
     box-sizing: border-box;
 }
- 
+
+.login-outer {
+    background-color: #425979;
+    background-blend-mode: lighten;
+    display: table;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+
+.login-middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.login-inner {
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+    color: white;
+    text-align: center;
+  }
+
+.login-outer img {
+    position: fixed;
+    width: 100%;
+    min-height: 100%;
+    height: auto;
+    left: 0;
+    top: 0;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.login-logo-name {
+    font-size: 60px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+}
+
+.login-logo {
+    font-size: 100px;
+    color: white;
+}
+
+.login-inner input {
+    width: 240px;
+    padding: 6px;
+    margin: 2px;
+    background-color: transparent;
+    color: white;
+    border: 0;
+    border-bottom: 2px solid white;
+    outline: none;
+}
+.login-inner input::placeholder {
+    color: white;
+}
+
+.login-message {
+    color: white;
+}
+
+.logo {
+    display: block;
+    color: gainsboro;
+    /* padding: 16px 32px 16px 46px; */
+    padding: 16px 16px 16px 16px;
+    font-weight: bold;
+    font-size: 38px;
+    color: white;
+    text-align: center;
+}
+
 body {
     background-color: white;
 }
@@ -36,13 +113,29 @@ body {
   
  .grid-item {
     width: 500px;
-    /* float: left; */
     background-color: white;
     margin: 40px;
     padding: 30px;
     box-shadow: 0px 6px 40px 0px #e2e2e2;
     border: 1px dashed #f2f7ff;
-  }
+}
+
+.grid-item hr {
+    width: 33%;
+    height: 3px;
+    border: none;
+    background-color: #31507a;
+    margin: 0 0 8px 0;
+}
+#outgoings-grid-item {
+    background-color: #DE7A22;
+}
+#monthly-salary-grid-item {
+    background-color: #346753;
+}
+#weekly-spending-money-outgoings-grid-item {
+    background-color: #1995AD;
+}
   
 /* .grid-item--width2 { width: 320px; }
 .grid-item--width3 { width: 480px; }
@@ -90,6 +183,10 @@ h1 {
     margin: 0px 0px 16px 0px;
 }
 
+h2 {
+    margin: 0 0 8px 0;
+}
+
 p {
     margin: 0px 0px 16px 0px;
     color: gray; 
@@ -103,15 +200,19 @@ table {
     width: 100%;
 }
 
-tr:nth-child(even) {
+.alternating tr:nth-child(even) {
     background-color: #f5f5f5;
 }
 
 td {
     border: none;
-    padding: 5px 20px 5px 5px;
+    padding: 5px 20px 5px 0px;
     width: 1%; /* Fit Content */
     white-space: nowrap;
+}
+
+.alternating td {
+    padding: 5px 20px 5px 5px;
 }
 
 td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. */
@@ -119,9 +220,15 @@ td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. 
     white-space: normal;
 }
 
-input, textarea, select {
+input, select {
     margin: 5px 0px 14px 0px;
-    border: 1px solid #31507a;
+    padding: 3px 5px;
+    border: 0;
+    border-bottom: 1px solid #31507a;
+    outline: none;
+}
+textarea {
+    margin: 5px 0px 14px 0px;
     padding: 3px 5px;
 }
 
@@ -162,6 +269,11 @@ textarea {
     bottom: 8px;
 }
 
+.navbar ul li:nth-last-child(2) {
+    position: absolute;
+    bottom: 64px;
+}
+
 .navbar .mdi {
     /* color: rgb(209, 209, 209); */
     color: white;
@@ -187,15 +299,4 @@ textarea {
         background: black;
         margin: 0;
     }
-}
-
-.logo {
-    display: block;
-    color: gainsboro;
-    /* padding: 16px 32px 16px 46px; */
-    padding: 16px 16px 16px 16px;
-    font-weight: bold;
-    font-size: 38px;
-    color: white;
-    text-align: center;
 }
