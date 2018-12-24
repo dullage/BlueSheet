@@ -41,7 +41,7 @@
     opacity: 0.1;
     z-index: -1;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-aspect-ratio: 8/10) {
     .login-outer img {
         width: 300%;
     }
@@ -272,6 +272,7 @@ textarea {
     top: 0;
     background: #425979;
     overflow: hidden;
+    z-index: 1;
 }
 
 .navbar li a {
@@ -292,7 +293,6 @@ textarea {
 }
 
 .navbar .mdi {
-    /* color: rgb(209, 209, 209); */
     color: white;
     margin: 0 10px 0 0;
 }
@@ -304,4 +304,44 @@ textarea {
 .navbar li a.current-page {
     color: white;
     font-weight: bold;
+}
+
+.navbar-banner {
+    display: none;
+    background-color: #425979;
+    height: 54px;
+    padding: 10px;
+}
+.navbar-banner span {
+    width: 100%;
+    padding: 16px 16px 16px 16px;
+    font-size: 30px;
+    color: white;
+}
+@media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
+    .navbar-banner {
+        display: block;
+    }
+    .hide-on-mobile {
+        display: none;
+    }
+    .main {
+        margin: 54px 0 0 0;
+    }
+    .navbar ul {
+        display: none;
+        width: 100%;
+        height: auto;
+        margin: 54px 0 0 0;
+    }
+    .navbar ul li:last-child {
+        position: initial;
+    }
+    .navbar ul li:nth-last-child(2) {
+        position: initial;
+    }
+
+    .grid-item {
+        margin: 20px;
+    }
 }

@@ -10,7 +10,7 @@
 
   <meta name="description" content="Personal & Household Finance Planning.">
   <meta name="author" content="Adam Dullage">
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=0.75">
 
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
@@ -25,14 +25,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
   <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='javascript.js') }}"></script>
 
 </head>
 
 <body>
 
   <div class="navbar">
-    <ul>
-      <li class="logo"><span class="mdi mdi-monitor-dashboard"></span><br>BlueSheet</li>
+    <ul id="links">
+      <li class="logo hide-on-mobile"><span class="mdi mdi-monitor-dashboard"><br>BlueSheet</span><br></li>
       <li><a href="{{ url_for('index') }}" {% if page == 'index' %}class="current-page"{% endif %}>
           <span class="mdi mdi-monitor-dashboard"></span>Dashboard
       </a></li>
@@ -51,6 +52,11 @@
         <span class="mdi mdi-logout-variant"></span>Logout
       </a></li>
     </ul>
+  </div>
+
+  <div class="navbar-banner">
+    <a href="#" onclick="toggle_element_by_id('links');"><span class="mdi mdi-menu"></span></a>
+    <span class="mdi mdi-monitor-dashboard"> BlueSheet</span>>
   </div>
 
   <div class="main">
