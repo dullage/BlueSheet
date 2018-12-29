@@ -152,6 +152,10 @@ class Configuration(db.Model):
     month_start_date = db.Column(db.Integer, nullable=False)
     weekly_pay_day = db.Column(db.Integer, nullable=False)
     weekly_spending_amount = db.Column(db.Numeric, nullable=False)
+    annual_expense_outgoing_id = db.Column(
+        db.Integer,
+        db.ForeignKey('outgoing.id')
+    )
     starling_api_key = db.Column(db.String(255))
 
     def __init__(
@@ -160,12 +164,14 @@ class Configuration(db.Model):
         month_start_date,
         weekly_pay_day,
         weekly_spending_amount,
+        annual_expense_outgoing_id=None,
         starling_api_key=None
     ):
         self.user_id = user_id
         self.month_start_date = month_start_date
         self.weekly_pay_day = weekly_pay_day
         self.weekly_spending_amount = weekly_spending_amount
+        self.annual_expense_outgoing_id = annual_expense_outgoing_id
         self.starling_api_key = starling_api_key
 
     @property
@@ -332,25 +338,6 @@ class AnnualExpense(db.Model):
     def monthly_saving(cls, user_id):
         return cls.annual_total(user_id) / 12
 
-    # @classmethod
-    # def target_balance(cls, user_id, month_num=None):
-    #     if month_num is None:
-    #         month_num = cls.current_month_num()
-
-    #     saved_so_far = cls.monthly_saving(user_id) * month_num
-
-    #     expenses_so_far = cls.by_month_range(
-    #         user_id,
-    #         1,
-    #         month_num - 1
-    #     )
-
-    #     spent_so_far = 0
-    #     for expense in expenses_so_far:
-    #         spent_so_far = spent_so_far + expense.value
-
-    #     return saved_so_far - spent_so_far
-
     @classmethod
     def end_of_month_target_balance(cls, user_id):
         """Runs a year long simulation of annual expense savings and expenses
@@ -390,6 +377,19 @@ class AnnualExpense(db.Model):
                 working_month = next_month(working_month)
 
         return -lowest_balance
+
+    @classmethod
+    def update_user_annual_expense_outgoing(cls, user):
+        outgoing_id = user.configuration.annual_expense_outgoing_id
+
+        if outgoing_id is None:
+            return
+        else:
+            for outgoing in user.outgoings:
+                if outgoing.id == outgoing_id:
+                    outgoing.value = cls.monthly_saving(user.id)
+            db.session.commit()
+            return
 
 
 db.create_all()
@@ -486,6 +486,7 @@ def configuration_handler():
             form_data['month_start_date'],
             form_data['weekly_pay_day'],
             form_data['weekly_spending_amount'],
+            form_data['annual_expense_outgoing_id'],
             form_data['starling_api_key']
         ))
     else:
@@ -493,6 +494,8 @@ def configuration_handler():
         user.configuration.weekly_pay_day = form_data['weekly_pay_day']
         user.configuration.weekly_spending_amount \
             = form_data['weekly_spending_amount']
+        user.configuration.annual_expense_outgoing_id \
+            = form_data['annual_expense_outgoing_id']
         user.configuration.starling_api_key = form_data['starling_api_key']
 
     if user.salary is None:
@@ -517,6 +520,8 @@ def configuration_handler():
         user.salary.pension_contribution = form_data['pension_contribution']
 
     db.session.commit()
+
+    AnnualExpense.update_user_annual_expense_outgoing(user)
 
     return redirect(url_for(form_data.get('return_page', 'index')))
 # endregion
@@ -719,12 +724,9 @@ def new_annual_expense():
         return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
-    target_month = request.args.get("target_month")
-
     return render_template(
         'new-annual-expense.html',
         user=user,
-        target_month=target_month,
         months=months
     )
 
@@ -745,6 +747,8 @@ def new_annual_expense_handler():
         form_data['notes']
     ))
     db.session.commit()
+
+    AnnualExpense.update_user_annual_expense_outgoing(user)
 
     return redirect(url_for('annual_expenses'))
 
@@ -769,6 +773,7 @@ def edit_annual_expense(annual_expense_id):
 def edit_annual_expense_handler(annual_expense_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
 
@@ -781,6 +786,8 @@ def edit_annual_expense_handler(annual_expense_id):
 
     db.session.commit()
 
+    AnnualExpense.update_user_annual_expense_outgoing(user)
+
     return redirect(url_for('annual_expenses'))
 
 
@@ -788,12 +795,15 @@ def edit_annual_expense_handler(annual_expense_id):
 def delete_annual_expense_handler(annual_expense_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     annual_expense = AnnualExpense.query.get(annual_expense_id)
 
     db.session.delete(annual_expense)
 
     db.session.commit()
+
+    AnnualExpense.update_user_annual_expense_outgoing(user)
 
     return redirect(url_for('annual_expenses'))
 # endregion

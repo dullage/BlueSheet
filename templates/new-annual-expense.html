@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set page = 'annual-expenses' %}
+{% set page = 'annual_expenses' %}
 {% block content %}
 
 <div class="input card">
@@ -9,7 +9,7 @@
     <span class="input-label">Month</span>
     <select name="month_paid" required>
       {% for month_num, month_name in months.items() %}
-        <option value="{{ month_num }}" {% if month_num == (target_month | int) %}selected{% endif %}>{{ month_name }}</option>
+        <option value="{{ month_num }}">{{ month_name }}</option>
       {% endfor %}
     </select>
     

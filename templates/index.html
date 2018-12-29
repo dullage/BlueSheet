@@ -11,7 +11,7 @@
     <table>
       <tbody>
         {% for account in user.accounts %}
-        <tr title="{{ account.notes }}">
+        <tr title="{{ account.notes if account.notes }}">
           <td>{{ account.name }}</td>
           <td>£ {{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
         </tr>
@@ -71,12 +71,12 @@
     <table>
       <tbody>
         <tr>
-          <td class="bold">Set</td>
-          <td class="bold">£ {{ "{:.2f}".format(user.configuration.weekly_spending_amount) }}</td>
-        </tr>
-        <tr>
           <td>Available</td>
           <td>£ {{ "{:.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings * 12)) / 52) }}</td>
+        </tr>
+        <tr>
+          <td class="bold">Set</td>
+          <td class="bold">£ {{ "{:.2f}".format(user.configuration.weekly_spending_amount) }}</td>
         </tr>
       </tbody>
     </table>
@@ -113,7 +113,7 @@
     <table>
       <tbody>
         {% for annual_expense in current_month_annual_expenses %}
-          <tr title="{{ annual_expense.notes }}">
+          <tr title="{{ annual_expense.notes if annual_expense.notes }}">
             <td>{{ annual_expense.name }}</td>
             <td>£ {{ '{:.2f}'.format(annual_expense.value) }}</td>
           </tr>
@@ -123,16 +123,7 @@
           <td class="bold">£ {{ '{:.2f}'.format(end_of_month_target_balance) }}</td>
         </tr>
       </tbody>
-    </table>
-    <!-- <h2>End of Month Target Balance</h2>
-    <table>
-      <tbody>
-        <tr>
-          <td class="bold">Current Target Balance</td>
-          <td class="bold">{#{ '{:.2f}'.format(end_of_month_target_balance) }#}</td>
-        </tr>
-      </tbody>
-    </table> -->
+    </table>  
   </div>
 
 </div>

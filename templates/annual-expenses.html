@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set page = 'annual-expenses' %}
+{% set page = 'annual_expenses' %}
 {% block content %}
 
 
@@ -36,8 +36,8 @@
   </table>
   <br>
   
-  <a href="{{ url_for('new_annual_expense', target_month=month_num) }}" class="button">
-    <span class="mdi mdi-plus"></span> New Outgoing
+  <a href="{{ url_for('new_annual_expense') }}" class="button">
+    <span class="mdi mdi-plus"></span> New Annual Expense
   </a>
   
 </div>
