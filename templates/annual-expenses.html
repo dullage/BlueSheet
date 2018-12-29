@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set page = 'annual-expenses' %}
+{% block content %}
+
+
+<div class="card" id="outgoings">
+  <h1>Annual Expenses</h1>
+  
+  <!-- <h2>{{ month_name }}</h2> -->
+  <table class="alternating">
+    <tbody>
+      {% for month_num, month_name in months.items() %}
+        {% for annual_expense in user.annual_expenses %}
+          {% if annual_expense.month_paid == month_num %}
+          <tr>
+            <td>{{ annual_expense.id }}</td>
+            <td>{{ month_name }}</td>
+            <td>{{ annual_expense.name }}</td>
+            <td>£{{ "{:.2f}".format(annual_expense.value) }}</td>
+            <td class="stretch">{{ annual_expense.notes if annual_expense.notes }}</td>
+            <td>
+              <a href="{{ url_for('edit_annual_expense', annual_expense_id=annual_expense.id) }}" title="Edit">
+                <span class="mdi mdi-pencil"></span>
+              </a>
+            </td>
+            <td>
+              <a href="{{ url_for('delete_annual_expense_handler', annual_expense_id=annual_expense.id) }}" title="Delete">
+                <span class="mdi mdi-delete"></span>
+              </a>
+            </td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
+  
+  <a href="{{ url_for('new_annual_expense', target_month=month_num) }}" class="button">
+    <span class="mdi mdi-plus"></span> New Outgoing
+  </a>
+  
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set page = 'annual-expense' %}
+{% block content %}
+
+<div class="input card">
+  <h1>Edit {{ annual_expense.name }}</h1>
+  <form action="{{ url_for('edit_annual_expense_handler', annual_expense_id=annual_expense.id) }}" method="POST">
+
+    <span class="input-label">Month</span>
+    <select name="month_paid" required>
+      {% for month_num, month_name in months.items() %}
+        <option value="{{ month_num }}" {% if month_num == annual_expense.month_paid %}selected{% endif %}>{{ month_name }}</option>
+      {% endfor %}
+    </select>
+    
+    <span class="input-label">Name</span>
+    <input type="text" name="name" minlength="1" maxlength="255" value="{{ annual_expense.name }}" required>
+    
+    <span class="input-label">Value</span>
+    £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(annual_expense.value) }}" required>
+    
+    <span class="input-label">Notes</span>
+    <textarea name="notes">{{ annual_expense.notes if annual_expense.notes }}</textarea>
+    
+    <button type="submit">
+      <span class="mdi mdi-content-save"></span> Save
+    </button>
+
+    <a href="{{ url_for('annual_expenses') }}" class="cancel button">
+        <span class="mdi mdi-close"></span> Cancel
+    </a>
+
+  </form>
+</div>
+
+{% endblock %}

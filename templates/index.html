@@ -11,7 +11,7 @@
     <table>
       <tbody>
         {% for account in user.accounts %}
-        <tr>
+        <tr title="{{ account.notes }}">
           <td>{{ account.name }}</td>
           <td>£ {{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
         </tr>
@@ -105,6 +105,35 @@
     </table>
   </div>
   {% endif %}
+
+  <div class="grid-item">
+    <h1>Annual Expenses</h1>
+    <hr id="annual-expenses-grid-item">
+    <p>This months annual expenses.</p>
+    <table>
+      <tbody>
+        {% for annual_expense in current_month_annual_expenses %}
+          <tr title="{{ annual_expense.notes }}">
+            <td>{{ annual_expense.name }}</td>
+            <td>£ {{ '{:.2f}'.format(annual_expense.value) }}</td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <td class="bold">End of Month Target Balance</td>
+          <td class="bold">£ {{ '{:.2f}'.format(end_of_month_target_balance) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <h2>End of Month Target Balance</h2>
+    <table>
+      <tbody>
+        <tr>
+          <td class="bold">Current Target Balance</td>
+          <td class="bold">{#{ '{:.2f}'.format(end_of_month_target_balance) }#}</td>
+        </tr>
+      </tbody>
+    </table> -->
+  </div>
 
 </div>
 

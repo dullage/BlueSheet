@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% set page = 'monthly-outgoings' %}
+{% set page = 'annual-expenses' %}
 {% block content %}
 
 <div class="input card">
-  <h1>New Outgoing</h1>
-  <form action="{{ url_for('new_outgoing_handler') }}" method="POST">
+  <h1>New Annual Expense</h1>
+  <form action="{{ url_for('new_annual_expense_handler') }}" method="POST">
 
-    <span class="input-label">Account</span>
-    <select name="account_id" required>
-      {% for account in user.accounts %}
-        <option value="{{ account.id }}" {% if account.id == account_id|int %}selected{% endif %}>{{ account.name }}</option>
+    <span class="input-label">Month</span>
+    <select name="month_paid" required>
+      {% for month_num, month_name in months.items() %}
+        <option value="{{ month_num }}" {% if month_num == (target_month | int) %}selected{% endif %}>{{ month_name }}</option>
       {% endfor %}
     </select>
     
@@ -26,7 +26,7 @@
       <span class="mdi mdi-content-save"></span> Save
     </button>
 
-    <a href="{{ url_for('outgoings') }}" class="cancel button">
+    <a href="{{ url_for('annual_expenses') }}" class="cancel button">
         <span class="mdi mdi-close"></span> Cancel
     </a>
 

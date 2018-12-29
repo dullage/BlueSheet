@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% set page = 'outgoings' %}
+{% set page = 'monthly-outgoings' %}
 {% block content %}
 
 {% for account in user.accounts %}
-<div class="card" id="outgoings">
+<div class="card">
   <h1>{{ account.name }}</h1>
   <table class="alternating">
     <tbody>
@@ -12,7 +12,6 @@
         <td>{{ outgoing.id }}</td>
         <td>{{ outgoing.name }}</td>
         <td>£{{ "{:.2f}".format(outgoing.value) }}</td>
-        <!-- <td>{{ outgoing.account.name }}</td> -->
         <td class="stretch">{{ outgoing.notes if outgoing.notes }}</td>
         <td>
           <a href="{{ url_for('edit_outgoing', outgoing_id=outgoing.id) }}" title="Edit">

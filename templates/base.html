@@ -40,10 +40,15 @@
       <li><a href="{{ url_for('accounts') }}" {% if page == 'accounts' %}class="current-page"{% endif %}>
           <span class="mdi mdi-bank"></span>Accounts
       </a></li>
-      <li><a href="{{ url_for('outgoings') }}" {% if page == 'outgoings' %}class="current-page"{% endif %}>
-          <span class="mdi mdi-currency-gbp"></span>Outgoings
+      <li><a href="{{ url_for('outgoings') }}" {% if page == 'monthly-outgoings' %}class="current-page"{% endif %}>
+          <span class="mdi mdi-currency-gbp"></span>Monthly Outgoings
       </a></li>
-      <!-- <li><a href="{{ url_for('index') }}">Pension / Savings</a></li> -->
+      <li><a href="{{ url_for('annual_expenses') }}" {% if page == 'annual-expenses' %}class="current-page"{% endif %}>
+        <span class="mdi mdi-calendar-multiselect"></span>Annual Expenses
+      </a></li>
+      <!-- <li><a href="{{ url_for('outgoings') }}" {% if page == 'outgoings' %}class="current-page"{% endif %}>
+        <span class="mdi mdi-currency-gbp"></span>Savings & Pension
+      </a></li> -->
 
       <li><a href="{{ url_for('configuration', return_page=page) }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
           <span class="mdi mdi-settings"></span>Configuration
