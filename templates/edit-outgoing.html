@@ -17,7 +17,11 @@
     <input type="text" name="name" minlength="1" maxlength="255" value="{{ outgoing.name }}" required>
     
     <span class="input-label">Value</span>
-    £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required>
+    £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required
+        {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
+          title="This value cannot be changed as it is linked to your Annual Expenses"
+          readonly
+        {% endif %}>
     
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ outgoing.notes if outgoing.notes }}</textarea>

@@ -10,18 +10,17 @@
       {% for outgoing in account.outgoings %}
       <tr {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}class="annual-expense-outgoing" 
       title="This outgoing is linked to your annual expenses and its value will be updated automatically"{% endif %}>
-        <td>{{ outgoing.id }}</td>
+        <td class="hide-on-mobile">{{ outgoing.id }}</td>
         <td>{{ outgoing.name }}</td>
         <td>£{{ "{:.2f}".format(outgoing.value) }}</td>
-        <td class="stretch">{{ outgoing.notes if outgoing.notes }}</td>
+        <td class="stretch hide-on-mobile">{{ outgoing.notes if outgoing.notes }}</td>
+        <td class="stretch"></td>
         <td>
-          {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
           <a href="{{ url_for('edit_outgoing', outgoing_id=outgoing.id) }}" title="Edit">
             <span class="mdi mdi-pencil"></span>
           </a>
-          {% endif %}
         </td>
-        <td>
+        <td class="hide-on-mobile">
           {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
           <a href="{{ url_for('delete_outgoing_handler', outgoing_id=outgoing.id) }}" title="Delete">
             <span class="mdi mdi-delete"></span>
@@ -33,7 +32,7 @@
     </tbody>
   </table>
   <br>
-
+  <br>
   <a href="{{ url_for('new_outgoing', account_id=account.id) }}" class="button">
     <span class="mdi mdi-plus"></span> New Outgoing
   </a>

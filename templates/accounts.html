@@ -5,39 +5,32 @@
 <div class="card">
   <h1>Accounts</h1>
   <table class="alternating">
-    <!-- <thead>
-      <th>Id</th>
-      <th>Name</th>
-      <th>Notes</th>
-      <th></th>
-      <th></th>
-    </thead> -->
     <tbody>
       {% for account in user.accounts %}
       <tr>
-          <td>{{ account.id }}</td>
-          <td>{{ account.name }}</td>
-          <td class="stretch">{{ account.notes if account.notes }}</td>
+          <td class="hide-on-mobile">{{ account.id }}</td>
+          <td >{{ account.name }}</td>
+          <td class="stretch hide-on-mobile">{{ account.notes if account.notes }}</td>
+          <td class="stretch"></td>
           <td>
-          <a href="{{ url_for('edit_account', account_id=account.id) }}" title="Edit">
-              <span class="mdi mdi-pencil"></span>
-          </a>
+            <a href="{{ url_for('edit_account', account_id=account.id) }}" title="Edit">
+                <span class="mdi mdi-pencil"></span>
+            </a>
           </td>
-          <td>
-          <a href="{{ url_for('delete_account_handler', account_id=account.id) }}" title="Delete">
-              <span class="mdi mdi-delete"></span>
-          </a>
+          <td class="hide-on-mobile">
+            <a href="{{ url_for('delete_account_handler', account_id=account.id) }}" title="Delete">
+                <span class="mdi mdi-delete"></span>
+            </a>
           </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   <br>
-  <form action="{{ url_for('new_account') }}">
-    <button type="submit">
+  <br>
+  <a href="{{ url_for('new_account') }}" class="button">
     <span class="mdi mdi-plus"></span> New Account
-    </button>
-  </form>
+  </a>
 </div>
 
 {% endblock %}
