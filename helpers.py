@@ -14,23 +14,33 @@ def empty_strings_to_none(dictionary):
     return new_dictionary
 
 
-demo_starling_account = {
-    "effective_balance": 78.63,
-    "savings_goals": {
-        "1": {
-            "name": "Holiday",
-            "total_saved_minor_units": 10345
-        },
-        "2": {
-            "name": "Wedding",
-            "total_saved_minor_units": 2344
-        },
-        "3": {
-            "name": "Christmas",
-            "total_saved_minor_units": 9876
-        }
-    }
-}
+class DemoStarlingAccount():
+    def __init__(self, effective_balance):
+        self.effective_balance = effective_balance
+        self.savings_goals = {}
+
+
+class DemoSavingsGoal():
+    def __init__(self, name, total_saved_minor_units):
+        self.name = name
+        self.total_saved_minor_units = total_saved_minor_units
+
+
+demo_starling_account = DemoStarlingAccount(
+    effective_balance=78.63
+)
+demo_starling_account.savings_goals["1"] = DemoSavingsGoal(
+    name="Holiday",
+    total_saved_minor_units=10345
+)
+demo_starling_account.savings_goals["2"] = DemoSavingsGoal(
+    name="Wedding",
+    total_saved_minor_units=2344
+)
+demo_starling_account.savings_goals["3"] = DemoSavingsGoal(
+    name="Christmas",
+    total_saved_minor_units=9876
+)
 
 months = {
     1: "January",

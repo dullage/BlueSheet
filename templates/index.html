@@ -85,27 +85,6 @@
       currently total £{{ "{:,.2f}".format(user.weekly_spending_calculations['goal_target']) }}.</p>
   </div>
 
-  {% if user.starling_account %}
-  <div class="grid-item">
-    <h1>Starling Account</h1>
-    <hr id="starling-account-grid-item">
-    <table>
-      <tbody>
-        <tr>
-          <td class="bold">Main Balance</td>
-          <td class="bold">£ {{ '{:.2f}'.format(user.starling_account.effective_balance) }}</td>
-        </tr>
-        {% for uid, savings_goal in user.starling_account.savings_goals.items() %}
-          <tr>
-            <td>{{ savings_goal.name }}</td>
-            <td>£ {{ '{:.2f}'.format(savings_goal.total_saved_minor_units / 100) }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
-
   <div class="grid-item">
     <h1>Annual Expenses</h1>
     <hr id="annual-expenses-grid-item">
@@ -125,6 +104,21 @@
       </tbody>
     </table>  
   </div>
+
+  {% if user.configuration.starling_api_key %}
+  <div class="grid-item">
+    <script type="text/javascript">
+      load_starling_data();
+    </script>
+    <h1>Starling Account</h1>
+    <hr id="starling-account-grid-item">
+    <span class="bold" id="starling-loading">Loading...</span>
+    <table id="starling-table">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 
 </div>
 

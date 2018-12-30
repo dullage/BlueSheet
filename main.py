@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, \
+    jsonify
 from flask_sqlalchemy import SQLAlchemy
 from helpers import ordinal, empty_strings_to_none, demo_starling_account, \
     months, next_month
@@ -454,6 +455,26 @@ def index():
         current_month_annual_expenses=current_month_annual_expenses,
         end_of_month_target_balance=end_of_month_target_balance
     )
+# endregion
+
+
+# region Starling Integration
+@app.route("/get-starling-data")
+def get_starling_data():
+    if User.login_required(session):
+        return "Session Expired!", 401
+    user = User.query.get(session['user_id'])
+
+    data = {
+        "Main Balance": "£ {:.2f}".format(
+            user.starling_account.effective_balance
+        )
+    }
+    for uid, savings_goal in user.starling_account.savings_goals.items():
+        data[savings_goal.name] \
+            = "£ {:.2f}".format(savings_goal.total_saved_minor_units / 100)
+
+    return jsonify(data)
 # endregion
 
 
