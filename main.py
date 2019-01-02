@@ -1,24 +1,30 @@
 #!/usr/bin/python3
-from flask import Flask, render_template, request, redirect, url_for, session, \
-    jsonify
+from flask import Flask, render_template, request, redirect, url_for, \
+    session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from helpers import ordinal, empty_strings_to_none, demo_starling_account, \
     months, next_month
 from spending import calculations
 from datetime import datetime, timedelta
-from os import environ, path
+from os import environ, path, urandom
 from starlingbank import StarlingAccount
 
 # Basic brute force prevent, see User class.
 if path.isfile("LOCK"):
     exit(1)
 
-DATABASE_PATH = environ.get('DATABASE_PATH', 'BlueSheet.db')
-SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+LOGIN_TIMEOUT_MINUTES = 30
 
 app = Flask(__name__)
-app.secret_key = b'bg31HxAIUmxAI'
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+
+# If the environment variable SECRET_KEY is not set a new secret key will be
+# generated each time the app starts. Note: This invaldates any existing
+# sessions.
+app.secret_key \
+    = environ.get('SECRET_KEY', urandom(16))
+
+app.config['SQLALCHEMY_DATABASE_URI'] \
+    = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
 
 db = SQLAlchemy(app)
 
@@ -66,6 +72,7 @@ class User(db.Model):
 
     @property
     def total_outgoings(self):
+        """The total value of all of the users outgoings."""
         total_outgoings = 0
         for outgoing in self.outgoings:
             total_outgoings = total_outgoings + outgoing.value
@@ -109,7 +116,10 @@ class User(db.Model):
             # Basic brute force prevention.
             cls._failed_login_attempts = cls._failed_login_attempts + 1
             if cls._failed_login_attempts >= 10:
+                # Create a file that prevents the app from starting without
+                # manual intervention.
                 open('LOCK', 'a').close()
+                # Close the app.
                 exit(1)
             else:
                 return False
@@ -121,12 +131,15 @@ class User(db.Model):
 
     @classmethod
     def login_required(cls, session):
+        """Carries out a number of checks and returns True if the user needs
+        to log in again.
+        """
         if 'user_id' not in session:
             return True
         if 'last_activity' not in session:
             return True
         if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
-                < (datetime.now() - timedelta(minutes=30)):
+                < (datetime.now() - timedelta(minutes=LOGIN_TIMEOUT_MINUTES)):
             return True
         else:
             session['last_activity'] = \
@@ -134,6 +147,9 @@ class User(db.Model):
             return False
 
     def configuration_required(self):
+        """Checks to see if the user has completed configuration and returns
+        True if not. This assumes that if configuration exists it is complete.
+        """
         if self.configuration is None:
             return True
         else:
