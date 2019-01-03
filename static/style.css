@@ -80,7 +80,6 @@
 .logo {
     display: block;
     color: gainsboro;
-    /* padding: 16px 32px 16px 46px; */
     padding: 16px 16px 16px 16px;
     font-weight: bold;
     font-size: 38px;
@@ -207,19 +206,18 @@ button, .button {
 }
 
 button:hover, .button:hover{
-    /* color: royalblue; */
     box-shadow: 0px 2px 4px 0px rgb(199, 199, 199);
 }
 
 #login-submit-button {
     background-color: transparent;
     border: none;
-    color: rgb(209, 209, 209);
+    color: white;
     box-shadow: none;
     outline: none;
 }
 #login-submit-button:hover {
-    color: white;
+    color: rgb(209, 209, 209);
     box-shadow: none;
 }
 
@@ -292,7 +290,6 @@ textarea {
 .input-label {
     font-weight: bold;
     display: block;
-    /* margin: 6px 0 0 0; */
 }
 
 .bold {

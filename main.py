@@ -2,18 +2,15 @@
 from flask import Flask, render_template, request, redirect, url_for, \
     session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from helpers import ordinal, empty_strings_to_none, demo_starling_account, \
-    months, next_month
-from spending import calculations
+from helpers import empty_strings_to_none, demo_starling_account, \
+    months, next_month, current_month_num, \
+    spending_money_savings_target_balance
 from datetime import datetime, timedelta
-from os import environ, path, urandom
+from os import environ, urandom
 from starlingbank import StarlingAccount
 
-# Basic brute force prevent, see User class.
-if path.isfile("LOCK"):
-    exit(1)
-
 LOGIN_TIMEOUT_MINUTES = 30
+MAX_FAILED_LOGIN_ATTEMPTS = 3
 
 app = Flask(__name__)
 
@@ -37,6 +34,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
+    failed_login_attempts = db.Column(db.Integer, nullable=False)
+    locked = db.Column(db.Boolean, nullable=False)
     configuration = db.relationship(
         "Configuration",
         backref="user",
@@ -69,65 +68,32 @@ class User(db.Model):
         self.id - id
         self.username = username
         self.password = password
-
-    @property
-    def total_outgoings(self):
-        """The total value of all of the users outgoings."""
-        total_outgoings = 0
-        for outgoing in self.outgoings:
-            total_outgoings = total_outgoings + outgoing.value
-        return total_outgoings
-
-    @property
-    def weekly_spending_calculations(self):
-        return calculations(
-            self.configuration.weekly_spending_amount,
-            self.configuration.month_start_date,
-            self.configuration.month_end_date,
-            self.configuration.weekly_pay_day
-        )
-
-    @property
-    def starling_account(self):
-        if self.configuration.starling_api_key is None:
-            return None
-        elif self.username == "demo":
-            return demo_starling_account
-        else:
-            try:
-                return StarlingAccount(
-                    self.configuration.starling_api_key,
-                    update=True
-                )
-            except: # noqa
-                return None
+        self.failed_login_attempts = 0
+        self.locked = False
 
     @classmethod
     def login(cls, username, password, session):
         user = User.query.filter_by(username=username).first()
-        login_failure = False
 
         if user is None:
-            login_failure = True
+            return False, "Login failed, please try again."
+        elif user.locked:
+            return False, "Account locked, please contact your administrator."
         elif user.password != password:
-            login_failure = True
-
-        if login_failure is True:
-            # Basic brute force prevention.
-            cls._failed_login_attempts = cls._failed_login_attempts + 1
-            if cls._failed_login_attempts >= 10:
-                # Create a file that prevents the app from starting without
-                # manual intervention.
-                open('LOCK', 'a').close()
-                # Close the app.
-                exit(1)
-            else:
-                return False
+            user.failed_login_attempts += 1
+            if user.failed_login_attempts >= MAX_FAILED_LOGIN_ATTEMPTS:
+                user.locked = True
+            db.session.commit()
+            return False, "Login failed, please try again."
         else:
+            user.failed_login_attempts = 0
+            db.session.commit()
+
             session['user_id'] = user.id
             session['last_activity'] = \
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            return user
+
+            return True, ""
 
     @classmethod
     def login_required(cls, session):
@@ -155,6 +121,36 @@ class User(db.Model):
         else:
             return False
 
+    @property
+    def total_outgoings(self):
+        """The total value of all of the users monthly outgoings."""
+        total_outgoings = 0
+        for outgoing in self.outgoings:
+            total_outgoings = total_outgoings + outgoing.value
+        return total_outgoings
+
+    @property
+    def weekly_spending_calculations(self):
+        return spending_money_savings_target_balance(
+            self.configuration.weekly_pay_day,
+            self.configuration.weekly_spending_amount
+        )
+
+    @property
+    def starling_account(self):
+        if self.configuration.starling_api_key is None:
+            return None
+        elif self.username == "demo":
+            return demo_starling_account
+        else:
+            try:
+                return StarlingAccount(
+                    self.configuration.starling_api_key,
+                    update=True
+                )
+            except: # noqa
+                return None
+
 
 class Configuration(db.Model):
     __tablename__ = "configuration"
@@ -166,7 +162,6 @@ class Configuration(db.Model):
         unique=True,
         nullable=False
     )
-    month_start_date = db.Column(db.Integer, nullable=False)
     weekly_pay_day = db.Column(db.Integer, nullable=False)
     weekly_spending_amount = db.Column(db.Numeric, nullable=False)
     annual_expense_outgoing_id = db.Column(
@@ -178,29 +173,16 @@ class Configuration(db.Model):
     def __init__(
         self,
         user_id,
-        month_start_date,
         weekly_pay_day,
         weekly_spending_amount,
         annual_expense_outgoing_id=None,
         starling_api_key=None
     ):
         self.user_id = user_id
-        self.month_start_date = month_start_date
         self.weekly_pay_day = weekly_pay_day
         self.weekly_spending_amount = weekly_spending_amount
         self.annual_expense_outgoing_id = annual_expense_outgoing_id
         self.starling_api_key = starling_api_key
-
-    @property
-    def month_start_date_ordinal(self):
-        return ordinal(self.month_start_date)
-
-    @property
-    def month_end_date(self):
-        if self.month_start_date == 1:
-            return 28
-        else:
-            return self.month_start_date - 1
 
 
 class Salary(db.Model):
@@ -324,11 +306,6 @@ class AnnualExpense(db.Model):
         self.value = value
         self.notes = notes
 
-    @staticmethod
-    def current_month_num():
-        """Returns the current month number as an integer."""
-        return int(datetime.now().strftime('%m'))
-
     @classmethod
     def by_month_range(cls, user_id, start_month_num, end_month_num):
         """Returns a list of AnnualExpense objects
@@ -362,7 +339,7 @@ class AnnualExpense(db.Model):
         negative amount is returned as a positive current target balance.
         """
         monthly_saving = cls.monthly_saving(user_id)
-        current_month = cls.current_month_num()
+        current_month = current_month_num()
 
         # Start the simulation next month as the presumption is that this
         # month has already been saved and spent.
@@ -426,14 +403,14 @@ def login():
 
 @app.route("/login-handler", methods=['POST'])
 def login_handler():
-    user = User.login(
+    login_result = User.login(
         request.form['username'],
         request.form['password'],
         session
     )
-    if user is False:
+    if login_result[0] is not True:
         return redirect(
-            url_for('login', message="Login failed, please try again.")
+            url_for('login', message=login_result[1])
         )
     else:
         return redirect(url_for('index'))
@@ -456,7 +433,7 @@ def index():
     if user.configuration_required():
         return redirect(url_for('configuration'))
 
-    current_month = AnnualExpense.current_month_num()
+    current_month = current_month_num()
     current_month_annual_expenses = AnnualExpense.by_month_range(
         user.id,
         current_month,
@@ -520,14 +497,12 @@ def configuration_handler():
     if user.configuration is None:
         db.session.add(Configuration(
             user.id,
-            form_data['month_start_date'],
             form_data['weekly_pay_day'],
             form_data['weekly_spending_amount'],
             form_data['annual_expense_outgoing_id'],
             form_data['starling_api_key']
         ))
     else:
-        user.configuration.month_start_date = form_data['month_start_date']
         user.configuration.weekly_pay_day = form_data['weekly_pay_day']
         user.configuration.weekly_spending_amount \
             = form_data['weekly_spending_amount']

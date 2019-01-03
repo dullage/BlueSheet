@@ -1,0 +1,4 @@
+flask
+flask_sqlalchemy
+starlingbank==2.0
+python-dateutil

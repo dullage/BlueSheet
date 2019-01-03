@@ -7,7 +7,7 @@
   <div class="grid-item">
     <h1>Outgoings</h1>
     <hr id="outgoings-grid-item">
-    <p>On the {{ user.configuration.month_start_date_ordinal }} of each month the following amounts need to be transferred into the respective account.</p>
+    <p>On the last day of each month the following amounts need to be transferred into their respective accounts.</p>
     <table>
       <tbody>
         {% for account in user.accounts %}
@@ -71,7 +71,9 @@
     <table>
       <tbody>
         <tr>
-          <td>Available</td>
+          <td title="The actual ammount available will go up and down depending on how many pay days are in a given month.">
+            Available (Approximate)
+          </td>
           <td>£ {{ "{:.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings * 12)) / 52) }}</td>
         </tr>
         <tr>
@@ -81,8 +83,9 @@
       </tbody>
     </table>
     <br>
-    <p>To cover future spending money the spending money savings goal should 
-      currently total £{{ "{:,.2f}".format(user.weekly_spending_calculations['goal_target']) }}.</p>
+    <h2>Future Spending Money Savings</h2>
+    <p>To cover future spending money savings should currently total:</p>
+    <span class="bold">£{{ "{:,.2f}".format(user.weekly_spending_calculations) }}</span>
   </div>
 
   <div class="grid-item">
