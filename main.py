@@ -18,10 +18,12 @@ app = Flask(__name__)
 # generated each time the app starts. Note: This invaldates any existing
 # sessions.
 app.secret_key \
-    = environ.get('SECRET_KEY', urandom(16))
+    = environ.get("SECRET_KEY", urandom(16))
 
-app.config['SQLALCHEMY_DATABASE_URI'] \
+app.config["SQLALCHEMY_DATABASE_URI"] \
     = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
@@ -65,7 +67,6 @@ class User(db.Model):
     )
 
     def __init__(self, username, password):
-        self.id - id
         self.username = username
         self.password = password
         self.failed_login_attempts = 0
