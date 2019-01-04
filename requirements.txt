@@ -1,5 +1,5 @@
-flask
-flask_sqlalchemy
+flask==1.0.2
+flask_sqlalchemy==2.3.2
 starlingbank==2.0
-python-dateutil
-click
+python-dateutil==2.7.5
+click==7.0

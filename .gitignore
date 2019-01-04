@@ -114,7 +114,7 @@ dmypy.json
 .pyre/
 
 # Custom
-.vscode/settings.json
+.vscode/
 *.db
 BlueSheet.url
 notes.txt
