@@ -307,19 +307,19 @@ class AnnualExpense(db.Model):
         self.notes = notes
 
     @classmethod
-    def by_month_range(cls, user_id, start_month_num, end_month_num):
+    def by_month_range(cls, user, start_month_num, end_month_num):
         """Returns a list of AnnualExpense objects
         given a User id and a target month."""
         return cls.query.filter(
-            cls.user_id == user_id,
+            cls.user_id == user.id,
             cls.month_paid >= start_month_num,
             cls.month_paid <= end_month_num
         )
 
     @classmethod
-    def annual_total(cls, user_id):
+    def annual_total(cls, user):
         annual_expenses = cls.query.filter_by(
-            user_id=user_id
+            user_id=user.id
         )
 
         annual_total = 0
@@ -329,16 +329,16 @@ class AnnualExpense(db.Model):
         return annual_total
 
     @classmethod
-    def monthly_saving(cls, user_id):
-        return cls.annual_total(user_id) / 12
+    def monthly_saving(cls, user):
+        return cls.annual_total(user) / 12
 
     @classmethod
-    def end_of_month_target_balance(cls, user_id):
+    def end_of_month_target_balance(cls, user):
         """Runs a year long simulation of annual expense savings and expenses
         and if at any point the account balance goes into the negative that
         negative amount is returned as a positive current target balance.
         """
-        monthly_saving = cls.monthly_saving(user_id)
+        monthly_saving = cls.monthly_saving(user)
         current_month = current_month_num()
 
         # Start the simulation next month as the presumption is that this
@@ -356,7 +356,7 @@ class AnnualExpense(db.Model):
 
             # Pay out the expenses throughout the month.
             for annual_expense in cls.query.filter_by(
-                user_id=user_id,
+                user_id=user.id,
                 month_paid=working_month
             ):
                 working_balance = working_balance - annual_expense.value
@@ -381,7 +381,7 @@ class AnnualExpense(db.Model):
         else:
             for outgoing in user.outgoings:
                 if outgoing.id == outgoing_id:
-                    outgoing.value = cls.monthly_saving(user.id)
+                    outgoing.value = cls.monthly_saving(user)
             db.session.commit()
             return
 
@@ -435,12 +435,12 @@ def index():
 
     current_month = current_month_num()
     current_month_annual_expenses = AnnualExpense.by_month_range(
-        user.id,
+        user,
         current_month,
         current_month
     )
     end_of_month_target_balance = \
-        AnnualExpense.end_of_month_target_balance(user.id)
+        AnnualExpense.end_of_month_target_balance(user)
 
     return render_template(
         'index.html',
@@ -582,10 +582,14 @@ def new_account_handler():
 def edit_account(account_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     return render_template(
         'edit-account.html',
-        account=Account.query.get(account_id)
+        account=Account.query.filter_by(
+            user_id=user.id,
+            id=account_id,
+        ).first()
     )
 
 
@@ -593,10 +597,14 @@ def edit_account(account_id):
 def edit_account_handler(account_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
 
-    account = Account.query.get(account_id)
+    account = Account.query.filter_by(
+        user_id=user.id,
+        id=account_id,
+    ).first()
 
     account.name = form_data['name']
     account.notes = form_data['notes']
@@ -610,8 +618,12 @@ def edit_account_handler(account_id):
 def delete_account_handler(account_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    account = Account.query.get(account_id)
+    account = Account.query.filter_by(
+        user_id=user.id,
+        id=account_id,
+    ).first()
 
     db.session.delete(account)
 
@@ -640,6 +652,8 @@ def new_outgoing():
         return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
+    # Note: This does no harm if the id is another users. It's only used to
+    # auto select a selection input.
     account_id = request.args.get("account_id")
 
     return render_template(
@@ -678,7 +692,10 @@ def edit_outgoing(outgoing_id):
     return render_template(
         'edit-outgoing.html',
         user=user,
-        outgoing=Outgoing.query.get(outgoing_id)
+        outgoing=Outgoing.query.filter_by(
+            user_id=user.id,
+            id=outgoing_id
+        ).first()
     )
 
 
@@ -686,10 +703,14 @@ def edit_outgoing(outgoing_id):
 def edit_outgoing_handler(outgoing_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
 
-    outgoing = Outgoing.query.get(outgoing_id)
+    outgoing = Outgoing.query.filter_by(
+        user_id=user.id,
+        id=outgoing_id
+    ).first()
 
     outgoing.account_id = form_data['account_id']
     outgoing.name = form_data['name']
@@ -705,8 +726,12 @@ def edit_outgoing_handler(outgoing_id):
 def delete_outgoing_handler(outgoing_id):
     if User.login_required(session):
         return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
 
-    outgoing = Outgoing.query.get(outgoing_id)
+    outgoing = Outgoing.query.filter_by(
+        user_id=user.id,
+        id=outgoing_id
+    ).first()
 
     db.session.delete(outgoing)
 
@@ -774,7 +799,10 @@ def edit_annual_expense(annual_expense_id):
     return render_template(
         'edit-annual-expense.html',
         user=user,
-        annual_expense=AnnualExpense.query.get(annual_expense_id),
+        annual_expense=AnnualExpense.query.filter_by(
+            user_id=user.id,
+            id=annual_expense_id
+        ).first(),
         months=months
     )
 
@@ -789,7 +817,10 @@ def edit_annual_expense_handler(annual_expense_id):
 
     form_data = empty_strings_to_none(request.form)
 
-    annual_expense = AnnualExpense.query.get(annual_expense_id)
+    annual_expense = AnnualExpense.query.filter_by(
+        user_id=user.id,
+        id=annual_expense_id
+    ).first()
 
     annual_expense.month_paid = form_data['month_paid']
     annual_expense.name = form_data['name']
@@ -809,7 +840,10 @@ def delete_annual_expense_handler(annual_expense_id):
         return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
-    annual_expense = AnnualExpense.query.get(annual_expense_id)
+    annual_expense = AnnualExpense.query.filter_by(
+        user_id=user.id,
+        id=annual_expense_id
+    ).first()
 
     db.session.delete(annual_expense)
 
