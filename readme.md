@@ -35,13 +35,17 @@ cd BlueSheet
 git clone https://github.com/Dullage/BlueSheet.git
 
 # Create a docker and docker-compose file
-touch docker
+touch dockerfile
 touch docker-compose.yaml
+
+# Create an empty database file
+touch BlueSheet.db
 ```
 You should now have an installation directory that looks like this:
 * **BlueSheet**
     * docker
     * docker-compose.yaml
+    * BlueSheet.db
     * **BlueSheet**
         * **static**
         * **templates**
@@ -77,7 +81,24 @@ services:
       - 5000:80
     restart: "always"
 ```
-Once created you should just be able to run:
+Once created, start the app with the following command:
 ```shell
 docker-compose up -d
+```
+You should now be able to navigate to the login screen at the IP address of the host machine on port 5000.
+
+Now you need to create a user, you can do this from the shell within the docker container:
+```shell
+# Open a shell in the docker container
+command docker exec -it bluesheet /bin/bash
+
+# Create a user
+python /app/bluesheet.py add-user -u joe.bloggs@example.com -p MyS3curePwd!
+```
+
+When the user first logs in they will be taken to the configuration page.
+
+If a user enters an incorrect password more than 3 times in a row their account will be locked, to unlock an account you can run the following (again from within the docker container):
+```shell
+python /app/bluesheet.py unlock-user -u joe.bloggs@example.com
 ```
