@@ -18,16 +18,18 @@
     
     <span class="input-label">Value</span>
     £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required
-        {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
-          title="This value cannot be changed as it is linked to your Annual Expenses"
-          readonly
-        {% endif %}>
-    
-    <span class="input-label">First Month Paid</span>
-    <input type="month" name="start_month" value="{{ outgoing.start_month_input_string }}">
+    {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
+      title="This value cannot be changed as it is linked to your Annual Expenses"
+      readonly
+    {% endif %}>
 
-    <span class="input-label">Last Month Paid</span>
-    <input type="month" name="end_month" value="{{ outgoing.end_month_input_string }}">
+    {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
+      <span class="input-label">First Month Paid</span>
+      <input type="month" name="start_month" value="{{ outgoing.start_month_input_string }}">
+
+      <span class="input-label">Last Month Paid</span>
+      <input type="month" name="end_month" value="{{ outgoing.end_month_input_string }}">
+    {% endif %}
     
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ outgoing.notes if outgoing.notes }}</textarea>

@@ -493,6 +493,8 @@ class AnnualExpense(db.Model):
             for outgoing in user.outgoings:
                 if outgoing.id == outgoing_id:
                     outgoing.value = cls.monthly_saving(user)
+                    outgoing.start_month = None
+                    outgoing.end_month = None
             db.session.commit()
             return
 
@@ -832,9 +834,9 @@ def edit_outgoing_handler(outgoing_id):
     outgoing.account_id = form_data['account_id']
     outgoing.name = form_data['name']
     outgoing.value = form_data['value']
-    outgoing.start_month = month_input_to_date(form_data['start_month'])
+    outgoing.start_month = month_input_to_date(form_data.get('start_month'))
     outgoing.end_month = \
-        month_input_to_date(form_data['end_month'], set_to_last_day=True)
+        month_input_to_date(form_data.get('end_month'), set_to_last_day=True)
     outgoing.notes = form_data['notes']
 
     db.session.commit()

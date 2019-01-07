@@ -274,8 +274,13 @@ td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. 
     color: rgb(153, 27, 153);
 }
 
-.future-historic-row td {
+.historic-row td,
+.disabled-input {
     color: lightgray;
+}
+
+.future-row td {
+    color: rgb(63, 98, 253);
 }
 
 input, select {
