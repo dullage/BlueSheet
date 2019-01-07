@@ -238,4 +238,21 @@ def spending_money_savings_target_balance(
     return target_balance
 
 
-# weekly_spending_money_savings(4, 65, calculation_date=date(2019, 3, 28), debug=True)  # noqa
+# spending_money_savings_target_balance(4, 65, calculation_date=date(2019, 1, 5), debug=True)  # noqa
+
+def month_input_to_date(month_input, set_to_last_day=False):
+    if month_input is None:
+        return None
+    elif set_to_last_day is False:
+        return datetime.strptime(month_input, "%Y-%m").date()
+    else:
+        return last_day_of_month(
+            datetime.strptime(month_input, "%Y-%m").date()
+        )
+
+
+def date_to_month_input(date_obj):
+    if date_obj is None:
+        return None
+    else:
+        return date_obj.strftime("%Y-%m")

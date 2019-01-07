@@ -33,35 +33,35 @@
 
   <div class="navbar">
     <ul id="links">
-      <li class="logo hide-on-mobile"><span class="mdi mdi-monitor-dashboard"><br>BlueSheet</span><br></li>
+      <li class="logo hide-on-mobile"><span class="mdi mdi-monitor-dashboard color-inherit"><br>BlueSheet</span><br></li>
       <li><a href="{{ url_for('index') }}" {% if page == 'index' %}class="current-page"{% endif %}>
-          <span class="mdi mdi-monitor-dashboard"></span>Dashboard
+          <span class="mdi mdi-monitor-dashboard color-inherit"></span>Dashboard
       </a></li>
       <li><a href="{{ url_for('accounts') }}" {% if page == 'accounts' %}class="current-page"{% endif %}>
-          <span class="mdi mdi-bank"></span>Accounts
+          <span class="mdi mdi-bank color-inherit"></span>Accounts
       </a></li>
-      <li><a href="{{ url_for('outgoings') }}" {% if page == 'monthly-outgoings' %}class="current-page"{% endif %}>
-          <span class="mdi mdi-currency-gbp"></span>Monthly Outgoings
+      <li><a href="{{ url_for('outgoings') }}" {% if page == 'outgoings' %}class="current-page"{% endif %}>
+          <span class="mdi mdi-currency-gbp color-inherit"></span>Monthly Outgoings
       </a></li>
       <li><a href="{{ url_for('annual_expenses') }}" {% if page == 'annual-expenses' %}class="current-page"{% endif %}>
-        <span class="mdi mdi-calendar-multiselect"></span>Annual Expenses
+        <span class="mdi mdi-calendar-multiselect color-inherit"></span>Annual Expenses
       </a></li>
       <!-- <li><a href="{{ url_for('outgoings') }}" {% if page == 'outgoings' %}class="current-page"{% endif %}>
         <span class="mdi mdi-currency-gbp"></span>Savings & Pension
       </a></li> -->
 
       <li><a href="{{ url_for('configuration', return_page=page) }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
-          <span class="mdi mdi-settings"></span>Configuration
+          <span class="mdi mdi-settings color-inherit"></span>Configuration
         </a></li>
       <li><a href="{{ url_for('logout') }}">
-        <span class="mdi mdi-logout-variant"></span>Logout
+        <span class="mdi mdi-logout-variant color-inherit"></span>Logout
       </a></li>
     </ul>
   </div>
 
   <div class="navbar-banner">
     <a href="#" onclick="toggle_element_by_id('links');"><span class="mdi mdi-menu"></span></a>
-    <span class="mdi mdi-monitor-dashboard"> BlueSheet</span>>
+    <span class="mdi mdi-monitor-dashboard color-inherit"> BlueSheet</span>>
   </div>
 
   <div class="main">

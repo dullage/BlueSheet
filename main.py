@@ -4,8 +4,10 @@ from flask import Flask, render_template, request, redirect, url_for, \
 from flask_sqlalchemy import SQLAlchemy
 from helpers import empty_strings_to_none, demo_starling_account, \
     months, next_month, current_month_num, \
-    spending_money_savings_target_balance
-from datetime import datetime, timedelta
+    spending_money_savings_target_balance, month_input_to_date, \
+    date_to_month_input
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from os import environ, urandom
 from starlingbank import StarlingAccount
 
@@ -106,7 +108,9 @@ class User(db.Model):
         if 'last_activity' not in session:
             return True
         if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
-                < (datetime.now() - timedelta(minutes=LOGIN_TIMEOUT_MINUTES)):
+                < (datetime.now() - relativedelta(
+                    minutes=LOGIN_TIMEOUT_MINUTES
+                )):
             return True
         else:
             session['last_activity'] = \
@@ -122,12 +126,12 @@ class User(db.Model):
         else:
             return False
 
-    @property
-    def total_outgoings(self):
+    def total_outgoings(self, month_offset=0):
         """The total value of all of the users monthly outgoings."""
         total_outgoings = 0
         for outgoing in self.outgoings:
-            total_outgoings = total_outgoings + outgoing.value
+            if outgoing.is_current(month_offset=month_offset):
+                total_outgoings = total_outgoings + outgoing.value
         return total_outgoings
 
     @property
@@ -267,6 +271,14 @@ class Account(db.Model):
         self.name = name
         self.notes = notes
 
+    def total_outgoings(self, month_offset=0):
+        """The total value of the accounts monthly outgoings."""
+        total_outgoings = 0
+        for outgoing in self.outgoings:
+            if outgoing.is_current(month_offset=month_offset):
+                total_outgoings = total_outgoings + outgoing.value
+        return total_outgoings
+
 
 class Outgoing(db.Model):
     __tablename__ = "outgoing"
@@ -280,14 +292,112 @@ class Outgoing(db.Model):
         db.ForeignKey('account.id'),
         nullable=False
     )
+    start_month = db.Column(db.Date)
+    end_month = db.Column(db.Date)
     notes = db.Column(db.String(8000))
 
-    def __init__(self, user_id, name, value, account_id, notes=None):
+    def __init__(self, user_id, name, value, account_id, start_month=None,
+                 end_month=None, notes=None):
         self.user_id = user_id
         self.name = name
         self.value = value
         self.account_id = account_id
+        self.start_month = start_month
+        self.end_month = end_month
         self.notes = notes
+
+    @property
+    def start_month_input_string(self):
+        return date_to_month_input(self.start_month)
+
+    @property
+    def end_month_input_string(self):
+        return date_to_month_input(self.end_month)
+
+    @property
+    def start_month_friendly(self):
+        if self.start_month is None:
+            return ""
+        else:
+            return self.start_month.strftime("%B %Y")
+
+    @property
+    def end_month_friendly(self):
+        if self.end_month is None:
+            return ""
+        else:
+            return self.end_month.strftime("%B %Y")
+
+    def is_future(self, month_offset=0):
+        if self.start_month is None:
+            return False
+
+        comparison_date = date.today() + relativedelta(months=month_offset)
+
+        if self.start_month > comparison_date:
+            return True
+        else:
+            return False
+
+    def is_historic(self, month_offset=0):
+        if self.end_month is None:
+            return False
+
+        comparison_date = date.today() + relativedelta(months=month_offset)
+
+        if self.end_month < comparison_date:
+            return True
+        else:
+            return False
+
+    def is_current(self, month_offset=0):
+        if self.is_historic(month_offset=month_offset) \
+           or self.is_future(month_offset=month_offset):
+            return False
+        else:
+            return True
+
+    @property
+    def is_dated(self):
+        if self.start_month is not None or self.end_month is not None:
+            return True
+        else:
+            return False
+
+    @property
+    def date_tooltip(self):
+        if not self.is_dated:
+            return ""
+
+        today = date.today()
+
+        # Start
+        if self.start_month is None:
+            start = ""
+        elif self.start_month > today:
+            start = "Starts"
+        else:
+            start = "Started"
+
+        # End
+        if self.end_month is None:
+            end = ""
+        elif self.end_month >= today:
+            end = "Ends"
+        else:
+            end = "Ended"
+
+        if self.start_month is not None and self.end_month is not None:
+            # Start and End Months
+            return f"\
+{start} {self.start_month_friendly}\n\
+{end} {self.end_month_friendly}\n"
+        elif self.start_month is not None:
+            # Start Month Only
+            return f"{start} {self.start_month_friendly}"
+        else:
+            # End Month Only
+            return f"{end} {self.end_month_friendly}"
 
 
 class AnnualExpense(db.Model):
@@ -643,7 +753,8 @@ def outgoings():
 
     return render_template(
         'outgoings.html',
-        user=user
+        user=user,
+        todays_date=date.today()
     )
 
 
@@ -677,7 +788,12 @@ def new_outgoing_handler():
         form_data['name'],
         form_data['value'],
         form_data['account_id'],
-        form_data['notes']
+        start_month=month_input_to_date(form_data['start_month']),
+        end_month=month_input_to_date(
+            form_data['end_month'],
+            set_to_last_day=True
+        ),
+        notes=form_data['notes']
     ))
     db.session.commit()
 
@@ -716,6 +832,9 @@ def edit_outgoing_handler(outgoing_id):
     outgoing.account_id = form_data['account_id']
     outgoing.name = form_data['name']
     outgoing.value = form_data['value']
+    outgoing.start_month = month_input_to_date(form_data['start_month'])
+    outgoing.end_month = \
+        month_input_to_date(form_data['end_month'], set_to_last_day=True)
     outgoing.notes = form_data['notes']
 
     db.session.commit()

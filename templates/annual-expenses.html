@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set page = 'annual_expenses' %}
+{% set page = 'annual-expenses' %}
 {% block content %}
 
 
@@ -20,12 +20,12 @@
             <td class="stretch hide-on-mobile">{{ annual_expense.notes if annual_expense.notes }}</td>
             <td>
               <a href="{{ url_for('edit_annual_expense', annual_expense_id=annual_expense.id) }}" title="Edit">
-                <span class="mdi mdi-pencil"></span>
+                <span class="mdi mdi-pencil color-inherit"></span>
               </a>
             </td>
             <td class="hide-on-mobile">
               <a href="{{ url_for('delete_annual_expense_handler', annual_expense_id=annual_expense.id) }}" title="Delete">
-                <span class="mdi mdi-delete"></span>
+                <span class="mdi mdi-delete color-inherit"></span>
               </a>
             </td>
           </tr>

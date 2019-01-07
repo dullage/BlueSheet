@@ -23,6 +23,12 @@
           readonly
         {% endif %}>
     
+    <span class="input-label">First Month Paid</span>
+    <input type="month" name="start_month" value="{{ outgoing.start_month_input_string }}">
+
+    <span class="input-label">Last Month Paid</span>
+    <input type="month" name="end_month" value="{{ outgoing.end_month_input_string }}">
+    
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ outgoing.notes if outgoing.notes }}</textarea>
     

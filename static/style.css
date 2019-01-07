@@ -225,6 +225,10 @@ button:hover, .button:hover{
     float: right;
 }
 
+.color-inherit {
+    color: inherit;
+}
+
 h1 {
     margin: 0px 0px 16px 0px;
 }
@@ -235,7 +239,7 @@ h2 {
 
 p {
     margin: 0px 0px 16px 0px;
-    color: gray; 
+    color: grey; 
 }
 
 table {
@@ -268,6 +272,10 @@ td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. 
 
 .annual-expense-outgoing td {
     color: rgb(153, 27, 153);
+}
+
+.future-historic-row td {
+    color: lightgray;
 }
 
 input, select {
@@ -325,7 +333,6 @@ textarea {
 }
 
 .navbar .mdi {
-    color: white;
     margin: 0 10px 0 0;
 }
 

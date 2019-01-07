@@ -5,21 +5,21 @@
 <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 580, "isFitWidth": true }'>
 
   <div class="grid-item">
-    <h1>Outgoings</h1>
+    <h1>Next Months Outgoings</h1>
     <hr id="outgoings-grid-item">
-    <p>On the last day of each month the following amounts need to be transferred into their respective accounts.</p>
+    <p>On the last day of the month the following amounts need to be transferred into their respective accounts.</p>
     <table>
       <tbody>
         {% for account in user.accounts %}
         <tr title="{{ account.notes if account.notes }}">
           <td>{{ account.name }}</td>
-          <td>£ {{ "{:.2f}".format(account.outgoings | sum(attribute="value")) }}</td>
+          <td>£ {{ "{:.2f}".format(account.total_outgoings(month_offset=1)) }}</td>
         </tr>
         {% endfor %}
         <tr><td><br></td></tr>
         <tr>
           <td class="bold">Total Outgoings</td>
-          <td class="bold">£ {{ "{:.2f}".format(user.total_outgoings) }}</td>
+          <td class="bold">£ {{ "{:.2f}".format(user.total_outgoings(month_offset=1)) }}</td>
         </tr>
       </tbody>
     </table>
@@ -56,8 +56,8 @@
           <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_net_salary / 12) }}</td>
         </tr>
         <tr>
-          <td class="bold">After Outgoings</td>
-          <td class="bold">£ {{ "{:,.2f}".format((user.salary.annual_net_salary / 12) - user.total_outgoings) }}</td>
+          <td class="bold" title="Based on next months outgoings">After Outgoings</td>
+          <td class="bold">£ {{ "{:,.2f}".format((user.salary.annual_net_salary / 12) - user.total_outgoings(month_offset=1)) }}</td>
         </tr>
       </tbody>
     </table>
@@ -68,11 +68,11 @@
     <hr id="weekly-spending-money-outgoings-grid-item">
     <table>
       <tbody>
-        <tr>
-          <td title="The actual ammount available will go up and down depending on how many pay days are in a given month.">
+        <tr title="Based on next months outgoings. The actual ammount available will go up and down depending on how many pay days are in a given month.">
+          <td>
             Available (Approximate)
           </td>
-          <td>£ {{ "{:.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings * 12)) / 52) }}</td>
+          <td>£ {{ "{:.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings(month_offset=1) * 12)) / 52) }}</td>
         </tr>
         <tr>
           <td class="bold">Set</td>
