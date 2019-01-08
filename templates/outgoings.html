@@ -11,18 +11,31 @@
         <tr {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
           class="annual-expense-outgoing" 
           title="This outgoing is linked to your annual expenses and its value will be updated automatically"
-        {% elif outgoing.is_future() %}
-          class="future-row"
         {% elif outgoing.is_historic() %}
           class="historic-row"
         {% endif %}>
           <td class="hide-on-mobile">{{ outgoing.id }}</td>
-          <td>{{ outgoing.name }}</td>
+          <td>
+            {{ outgoing.name }} 
+            {% if outgoing.is_dated %}
+              <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
+            {% endif %}
+          </td>
           <td>£{{ "{:.2f}".format(outgoing.value) }}</td>
           <td class="stretch hide-on-mobile">
             {% if outgoing.is_dated %}
-            <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
+              <!-- Start / End Wording -->
+              {% if outgoing.is_future() %}
+                Starts {{ outgoing.start_month_friendly }}
+              {% elif outgoing.is_historic() %}
+                Ended {{ outgoing.end_month_friendly }}
+              {% endif %}
+              <!-- Seperator -->
+              {% if outgoing.notes %}
+               - 
+              {% endif %}
             {% endif %}
+            <!-- Notes -->
             {{ outgoing.notes if outgoing.notes }}
           </td>
           <td class="stretch"></td>

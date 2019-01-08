@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from helpers import empty_strings_to_none, demo_starling_account, \
     months, next_month, current_month_num, \
     spending_money_savings_target_balance, month_input_to_date, \
-    date_to_month_input
+    date_to_month_input, month_count
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from os import environ, urandom
@@ -365,6 +365,20 @@ class Outgoing(db.Model):
             return False
 
     @property
+    def months_paid(self):
+        if self.start_month is None or self.end_month is None:
+            return 0  # Not desinged to be used without start and end dates
+        else:
+            return month_count(self.start_month, self.end_month)
+
+    @property
+    def payments_total(self):
+        if self.start_month is None or self.end_month is None:
+            return 0  # Not desinged to be used without start and end dates
+        else:
+            return self.value * self.months_paid
+
+    @property
     def date_tooltip(self):
         if not self.is_dated:
             return ""
@@ -391,7 +405,9 @@ class Outgoing(db.Model):
             # Start and End Months
             return f"\
 {start} {self.start_month_friendly}\n\
-{end} {self.end_month_friendly}\n"
+{end} {self.end_month_friendly}\n\
+\n\
+{self.months_paid} payment(s) totaling £{self.payments_total:.2f}"
         elif self.start_month is not None:
             # Start Month Only
             return f"{start} {self.start_month_friendly}"

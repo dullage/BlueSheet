@@ -256,3 +256,18 @@ def date_to_month_input(date_obj):
         return None
     else:
         return date_obj.strftime("%Y-%m")
+
+
+def month_count(start_date, end_date):
+    count = 0
+    one_month = relativedelta(months=1)
+
+    while True:
+        count += 1
+        if start_date.year == end_date.year \
+           and start_date.month == end_date.month:
+            break
+        else:
+            start_date += one_month
+
+    return count
