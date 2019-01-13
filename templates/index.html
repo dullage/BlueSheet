@@ -2,7 +2,7 @@
 {% set page = 'index' %}
 {% block content %}
 
-<div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 580, "isFitWidth": true }'>
+<div class="grid" data-masonry='{ "itemSelector": ".grid-item",  "isFitWidth": true }'>
 
   <div class="grid-item">
     <h1>Next Months Outgoings</h1>
@@ -89,21 +89,6 @@
     </table>
   </div>
 
-  {% if user.configuration.starling_api_key %}
-  <div class="grid-item">
-    <script type="text/javascript">
-      load_starling_data();
-    </script>
-    <h1>Starling Account</h1>
-    <hr id="starling-account-grid-item">
-    <span id="starling-loading" class="mdi mdi-loading mdi-spin color-inherit"></span>
-    <table id="starling-table">
-      <tbody>
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
-
   <div class="grid-item">
       <h1>Monthly Salary</h1>
       <hr id="monthly-salary-grid-item">
@@ -141,6 +126,21 @@
         </tbody>
       </table>
     </div>  
+
+    {% if user.configuration.starling_api_key %}
+    <div class="grid-item">
+      <script type="text/javascript">
+        load_starling_data();
+      </script>
+      <h1>Starling Account</h1>
+      <hr id="starling-account-grid-item">
+      <span id="starling-loading" class="mdi mdi-loading mdi-spin color-inherit"></span>
+      <table id="starling-table">
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
 
 </div>
 

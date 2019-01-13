@@ -132,7 +132,7 @@ body {
 
 .grid {
     background: white;
-    margin: 20px auto 0 auto;
+    margin: 0 auto;
   }
 .grid:after {
     content: '';
@@ -151,7 +151,7 @@ body {
     .grid-item {
         width: 100%;
         margin: 0 0 40px 0;
-        padding: 30px;
+        padding: 10px;
         box-shadow: none;
         border: none;
     }
@@ -411,9 +411,5 @@ textarea {
     }
     .navbar ul li:nth-last-child(2) {
         position: initial;
-    }
-
-    .grid-item {
-        margin: 20px;
     }
 }
