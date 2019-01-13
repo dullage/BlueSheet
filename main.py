@@ -320,6 +320,12 @@ class Account(db.Model):
                 total_outgoings = total_outgoings + outgoing.value
         return total_outgoings
 
+    def delete(self):
+        for outgoing in self.outgoings:
+            outgoing.delete()
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Outgoing(db.Model):
     __tablename__ = "outgoing"
@@ -526,6 +532,16 @@ class Outgoing(db.Model):
 
         db.session.commit()
 
+    def delete(self):
+        # If this outgoing is used for annual expenses, unlink it first
+        user_configuration = Configuration.query.filter_by(
+            user_id=self.user_id).first()
+        if user_configuration.annual_expense_outgoing_id == self.id:
+            user_configuration.annual_expense_outgoing_id = None
+
+        db.session.delete(self)
+        db.session.commit()
+
 
 class AnnualExpense(db.Model):
     __tablename__ = "annual_expense"
@@ -625,6 +641,10 @@ class AnnualExpense(db.Model):
             db.session.commit()
             return
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Saving(db.Model):
     __tablename__ = "saving"
@@ -652,6 +672,15 @@ class Saving(db.Model):
             return True
         else:
             return False
+
+    def delete(self):
+        # If an outgoing is linked, unlink if first
+        outgoing = Outgoing.query.filter_by(linked_saving_id=self.id).first()
+        if outgoing is not None:
+            outgoing.linked_saving_id = None
+
+        db.session.delete(self)
+        db.session.commit()
 
 
 db.create_all()
@@ -894,9 +923,7 @@ def delete_account_handler(account_id):
         id=account_id,
     ).first()
 
-    db.session.delete(account)
-
-    db.session.commit()
+    account.delete()
 
     return redirect(url_for('accounts'))
 # endregion
@@ -1017,9 +1044,7 @@ def delete_outgoing_handler(outgoing_id):
         id=outgoing_id
     ).first()
 
-    db.session.delete(outgoing)
-
-    db.session.commit()
+    outgoing.delete()
 
     return redirect(url_for('outgoings'))
 # endregion
@@ -1129,9 +1154,7 @@ def delete_annual_expense_handler(annual_expense_id):
         id=annual_expense_id
     ).first()
 
-    db.session.delete(annual_expense)
-
-    db.session.commit()
+    annual_expense.delete()
 
     AnnualExpense.update_user_annual_expense_outgoing(user)
 
@@ -1231,9 +1254,7 @@ def delete_saving_handler(saving_id):
         id=saving_id,
     ).first()
 
-    db.session.delete(saving)
-
-    db.session.commit()
+    saving.delete()
 
     return redirect(url_for('savings'))
 # endregion

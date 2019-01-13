@@ -29,7 +29,7 @@
           <td class="stretch hide-on-mobile">
             {% if outgoing.is_dated %}
               <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
-            {% endif %} 
+            {% endif %}
             {{ outgoing.notes if outgoing.notes }}
           </td>
           <td class="stretch"></td>
@@ -39,11 +39,9 @@
             </a>
           </td>
           <td class="hide-on-mobile">
-            {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
-            <a href="{{ url_for('delete_outgoing_handler', outgoing_id=outgoing.id) }}" title="Delete">
+            <a href="#" onclick="delete_warning('outgoing', {{ outgoing.id }});" title="Delete">
               <span class="mdi mdi-delete color-inherit"></span>
             </a>
-            {% endif %}
           </td>
         </tr>
       {% endfor %}

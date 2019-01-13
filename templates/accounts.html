@@ -18,7 +18,7 @@
             </a>
           </td>
           <td class="hide-on-mobile">
-            <a href="{{ url_for('delete_account_handler', account_id=account.id) }}" title="Delete">
+            <a href="#" onclick="delete_warning('account', {{ account.id }});" title="Delete">
                 <span class="mdi mdi-delete color-inherit"></span>
             </a>
           </td>

@@ -74,3 +74,29 @@ function self_loan_checkbox_handle() {
     end_month.required = false;
   }
 }
+
+function delete_warning(type, id) {
+  if (type == "account") {
+    if (window.confirm("Are you sure you want to delete this account?\nNote: Any outgoings for this account will also be deleted.") == true) {
+      window.location.href = `/delete-account-handler/${id}`;
+    }
+  }
+
+  if (type == "outgoing") {
+    if (window.confirm("Are you sure you want to delete this outgoing?") == true) {
+      window.location.href = `/delete-outgoing-handler/${id}`;
+    }
+  }
+
+  if (type == "annual-expense") {
+    if (window.confirm("Are you sure you want to delete this annual expense?") == true) {
+      window.location.href = `/delete-annual-expense-handler/${id}`;
+    }
+  }
+
+  if (type == "saving") {
+    if (window.confirm("Are you sure you want to delete this saving?") == true) {
+      window.location.href = `/delete-saving-handler/${id}`;
+    }
+  }
+}
