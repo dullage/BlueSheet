@@ -295,12 +295,12 @@ td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. 
     color: lightgray;
 }
 
-.alert {
-    color: crimson;
+.future-row td {
+    color: rgb(60, 87, 207);
 }
 
-.future-row td {
-    color: rgb(63, 98, 253);
+.alert {
+    color: crimson;
 }
 
 input, select {
