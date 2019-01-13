@@ -5,7 +5,7 @@ A web app to help manage personal finances.
 ![Outgoings - Mobile](docs/outgoings-mobile.png)
 
 ## Introduction
-I was looking for a project to help me learn HTML and CSS and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances.
+I was looking for a project to improve my (non-existent) HTML and CSS knowledge and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances. It also gave me an opportunity to expolore SQL Alchemy and Jinja templating.
 
 It was designed with the following methodology in mind.
 
@@ -13,9 +13,13 @@ It was designed with the following methodology in mind.
 2. On the last day of the month, enough money to cover all monthly outgoings is paid into the account from which they are taken.
 3. The remaining balance (expandable income) is saved and then withdrawn weekly (on the same day every week) throuhout the month.
 
-## Other Feaures
-* Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
+## Feaures
+* Track monthly outgoings and ensure enough money is saved to cover them all.
 * Record and save for Annual Expenses - Link a monthly outgoing to your annual expenses so that the money is saved and ready when needed.
+* Record savings accounts and pensions to get a total of all savings.
+* Link an outgoing to a saving to increase the savings account balance by that amount each month.
+* Create "self loans" allowing you to borrow from savings and create a re-payment plan.
+* Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
 * Starling Bank Integration - See your main acocunt and savings goal balances on the dashboard.
 * Multiple User Support - Multiple users can each have their own password protected set of data.
 * Mobile Responsive.
@@ -76,6 +80,7 @@ services:
     # Tell BlueSheet where to find the database
     environment:
       - DATABASE_PATH=/app_data/BlueSheet.db
+      # - "SECRET_KEY=<Secure Password>" # Optional, will be generated on each start if unset.
     # Run on local port 5000
     ports:
       - 5000:80

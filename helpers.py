@@ -262,6 +262,9 @@ def month_count(start_date, end_date):
     count = 0
     one_month = relativedelta(months=1)
 
+    if start_date > end_date:
+        return 0
+
     while True:
         count += 1
         if start_date.year == end_date.year \
@@ -271,3 +274,10 @@ def month_count(start_date, end_date):
             start_date += one_month
 
     return count
+
+
+def checkbox_to_boolean(value):
+    if value == "on":
+        return True
+    else:
+        return False

@@ -59,7 +59,8 @@
     color: white;
 }
 
-.login-inner input {
+.login-inner input[type=text],
+.login-inner input[type=password] {
     width: 240px;
     padding: 6px;
     margin: 2px;
@@ -69,8 +70,19 @@
     border-bottom: 2px solid white;
     outline: none;
 }
-.login-inner input::placeholder {
+.login-inner input[type=text]::placeholder,
+.login-inner input[type=password]::placeholder {
     color: white;
+}
+
+.login-inner input[type=checkbox] {
+    vertical-align: -1px;
+}
+.login-inner #remember-me {
+    color: white;
+    vertical-align: 1px;
+    font-size: 15px;
+    margin-right: 20px;
 }
 
 .login-message {
@@ -161,10 +173,13 @@ body {
     background-color: rgb(123,197,246);
 }
 #starling-account-grid-item {
-    background-color: rgb(46,72,126)
+    background-color: rgb(46,72,126);
 }
 #annual-expenses-grid-item {
-    background-color: rgb(71, 126, 46)
+    background-color: rgb(71, 126, 46);
+}
+#savings-grid-item {
+    background-color: rgb(224, 60, 60);
 }
   
 /* .grid-item--width2 { width: 320px; }
@@ -275,8 +290,13 @@ td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. 
 }
 
 .historic-row td,
-.disabled-input {
+.disabled-input,
+.subtext {
     color: lightgray;
+}
+
+.alert {
+    color: crimson;
 }
 
 .future-row td {
@@ -303,6 +323,17 @@ textarea {
 .input-label {
     font-weight: bold;
     display: block;
+}
+
+.mdi-help-circle-outline {
+    margin: 0 0 0 4px;
+    font-size: 20px;
+}
+
+.section-border {
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 8px 8px 0 8px;
 }
 
 .bold {

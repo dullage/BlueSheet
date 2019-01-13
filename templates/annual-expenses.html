@@ -16,7 +16,7 @@
             <td class="hide-on-mobile">{{ annual_expense.id }}</td>
             <td>{{ month_name }}</td>
             <td>{{ annual_expense.name }}</td>
-            <td>£{{ "{:.2f}".format(annual_expense.value) }}</td>
+            <td>£{{ "{:,.2f}".format(annual_expense.value) }}</td>
             <td class="stretch hide-on-mobile">{{ annual_expense.notes if annual_expense.notes }}</td>
             <td>
               <a href="{{ url_for('edit_annual_expense', annual_expense_id=annual_expense.id) }}" title="Edit">

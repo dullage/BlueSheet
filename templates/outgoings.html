@@ -21,18 +21,22 @@
               <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
             {% endif %}
           </td>
-          <td>£{{ "{:.2f}".format(outgoing.value) }}</td>
+          <td>£{{ "{:,.2f}".format(outgoing.value) }}</td>
           <td class="stretch hide-on-mobile">
             {% if outgoing.is_dated %}
               <!-- Start / End Wording -->
               {% if outgoing.is_future() %}
                 Starts {{ outgoing.start_month_friendly }}
+                <!-- Seperator -->
+                {% if outgoing.notes %}
+                 - 
+                {% endif %}
               {% elif outgoing.is_historic() %}
                 Ended {{ outgoing.end_month_friendly }}
-              {% endif %}
-              <!-- Seperator -->
-              {% if outgoing.notes %}
-               - 
+                <!-- Seperator -->
+                {% if outgoing.notes %}
+                 - 
+                {% endif %}
               {% endif %}
             {% endif %}
             <!-- Notes -->

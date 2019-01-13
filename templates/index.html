@@ -12,52 +12,14 @@
       <tbody>
         {% for account in user.accounts %}
         <tr title="{{ account.notes if account.notes }}">
-          <td>{{ account.name }}</td>
-          <td>£ {{ "{:.2f}".format(account.total_outgoings(month_offset=1)) }}</td>
+          <td class="stretch">{{ account.name }}</td>
+          <td>£ {{ "{:,.2f}".format(account.total_outgoings(month_offset=1)) }}</td>
         </tr>
         {% endfor %}
-        <tr><td><br></td></tr>
+        <tr><td class="stretch"><br></td></tr>
         <tr>
-          <td class="bold">Total Outgoings</td>
-          <td class="bold">£ {{ "{:.2f}".format(user.total_outgoings(month_offset=1)) }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="grid-item">
-    <h1>Monthly Salary</h1>
-    <hr id="monthly-salary-grid-item">
-    <table>
-      <tbody>
-        <tr>
-          <td class="bold">Gross Salary</td>
-          <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_gross_salary / 12) }}</td>
-        </tr>
-        <tr>
-          <td>Tax</td>
-          <td>- £ {{ "{:,.2f}".format(user.salary.annual_tax / 12) }}</td>
-        </tr>
-        <tr>
-          <td>National Insurance</td>
-          <td>- £ {{ "{:,.2f}".format(user.salary.annual_ni / 12) }}</td>
-        </tr>
-        <tr>
-          <td>Pension Contributions</td>
-          <td>- £ {{ "{:,.2f}".format(user.salary.annual_pension / 12) }}</td>
-        </tr>
-        <tr>
-          <td>Pension Tax Relief</td>
-          <td>+ £ {{ "{:,.2f}".format(user.salary.annual_pension_tax_relief / 12) }}</td>
-        </tr>
-        <tr><td><br></td></tr>
-        <tr>
-          <td class="bold">Net Salary</td>
-          <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_net_salary / 12) }}</td>
-        </tr>
-        <tr>
-          <td class="bold" title="Based on next months outgoings">After Outgoings</td>
-          <td class="bold">£ {{ "{:,.2f}".format((user.salary.annual_net_salary / 12) - user.total_outgoings(month_offset=1)) }}</td>
+          <td class="bold stretch">Total Outgoings</td>
+          <td class="bold">£ {{ "{:,.2f}".format(user.total_outgoings(month_offset=1)) }}</td>
         </tr>
       </tbody>
     </table>
@@ -68,15 +30,15 @@
     <hr id="weekly-spending-money-outgoings-grid-item">
     <table>
       <tbody>
+        <tr>
+          <td class="bold stretch">Set</td>
+          <td class="bold">£ {{ "{:,.2f}".format(user.configuration.weekly_spending_amount) }}</td>
+        </tr>
         <tr title="Based on next months outgoings. The actual ammount available will go up and down depending on how many pay days are in a given month.">
-          <td>
+          <td class="stretch">
             Available (Approximate)
           </td>
-          <td>£ {{ "{:.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings(month_offset=1) * 12)) / 52) }}</td>
-        </tr>
-        <tr>
-          <td class="bold">Set</td>
-          <td class="bold">£ {{ "{:.2f}".format(user.configuration.weekly_spending_amount) }}</td>
+          <td>£ {{ "{:,.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings(month_offset=1) * 12)) / 52) }}</td>
         </tr>
       </tbody>
     </table>
@@ -94,16 +56,37 @@
       <tbody>
         {% for annual_expense in current_month_annual_expenses %}
           <tr title="{{ annual_expense.notes if annual_expense.notes }}">
-            <td>{{ annual_expense.name }}</td>
-            <td>£ {{ '{:.2f}'.format(annual_expense.value) }}</td>
+            <td class="stretch">{{ annual_expense.name }}</td>
+            <td>£ {{ '{:,.2f}'.format(annual_expense.value) }}</td>
           </tr>
         {% endfor %}
         <tr>
-          <td class="bold">End of Month Target Balance</td>
-          <td class="bold">£ {{ '{:.2f}'.format(end_of_month_target_balance) }}</td>
+          <td class="bold stretch">End of Month Target Balance</td>
+          <td class="bold">£ {{ '{:,.2f}'.format(end_of_month_target_balance) }}</td>
         </tr>
       </tbody>
     </table>  
+  </div>
+
+  <div class="grid-item">
+    <h1>Savings & Pension</h1>
+    <hr id="savings-grid-item">
+    <table>
+      <tbody>
+        <tr>
+          <td class="stretch bold">Balance Total</td>
+          <td class="bold">£ {{ "{:,.2f}".format(user.total_savings) }}</td>
+        </tr>
+        <tr>
+          <td class="stretch">Outstanding Self Loans Total</td>
+          <td>£ {{ "{:,.2f}".format(user.outstanding_self_loan_value) }}</td>
+        </tr>
+        <tr>
+          <td class="stretch">Total Including Self Loans</td>
+          <td>£ {{ "{:,.2f}".format(user.total_savings + user.outstanding_self_loan_value) }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   {% if user.configuration.starling_api_key %}
@@ -113,13 +96,51 @@
     </script>
     <h1>Starling Account</h1>
     <hr id="starling-account-grid-item">
-    <span class="bold" id="starling-loading">Loading...</span>
+    <span id="starling-loading" class="mdi mdi-loading mdi-spin color-inherit"></span>
     <table id="starling-table">
       <tbody>
       </tbody>
     </table>
   </div>
   {% endif %}
+
+  <div class="grid-item">
+      <h1>Monthly Salary</h1>
+      <hr id="monthly-salary-grid-item">
+      <table>
+        <tbody>
+          <tr>
+            <td class="bold stretch">Gross Salary</td>
+            <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_gross_salary / 12) }}</td>
+          </tr>
+          <tr>
+            <td class="stretch">Tax</td>
+            <td>- £ {{ "{:,.2f}".format(user.salary.annual_tax / 12) }}</td>
+          </tr>
+          <tr>
+            <td class="stretch">National Insurance</td>
+            <td>- £ {{ "{:,.2f}".format(user.salary.annual_ni / 12) }}</td>
+          </tr>
+          <tr>
+            <td class="stretch">Pension Contributions</td>
+            <td>- £ {{ "{:,.2f}".format(user.salary.annual_pension / 12) }}</td>
+          </tr>
+          <tr>
+            <td class="stretch">Pension Tax Relief</td>
+            <td>+ £ {{ "{:,.2f}".format(user.salary.annual_pension_tax_relief / 12) }}</td>
+          </tr>
+          <tr><td class="stretch"><br></td></tr>
+          <tr>
+            <td class="bold stretch">Net Salary</td>
+            <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_net_salary / 12) }}</td>
+          </tr>
+          <tr>
+            <td class="bold stretch" title="Based on next months outgoings">After Outgoings</td>
+            <td class="bold">£ {{ "{:,.2f}".format((user.salary.annual_net_salary / 12) - user.total_outgoings(month_offset=1)) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>  
 
 </div>
 

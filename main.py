@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from helpers import empty_strings_to_none, demo_starling_account, \
     months, next_month, current_month_num, \
     spending_money_savings_target_balance, month_input_to_date, \
-    date_to_month_input, month_count
+    date_to_month_input, month_count, checkbox_to_boolean, first_day_of_month
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from os import environ, urandom
@@ -40,6 +40,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     failed_login_attempts = db.Column(db.Integer, nullable=False)
     locked = db.Column(db.Boolean, nullable=False)
+    next_saving_process_date = db.Column(db.Date)
     configuration = db.relationship(
         "Configuration",
         backref="user",
@@ -62,6 +63,11 @@ class User(db.Model):
         backref="user",
         lazy=True
     )
+    savings = db.relationship(
+        "Saving",
+        backref="user",
+        lazy=True
+    )
     annual_expenses = db.relationship(
         "AnnualExpense",
         backref="user",
@@ -74,8 +80,23 @@ class User(db.Model):
         self.failed_login_attempts = 0
         self.locked = False
 
+    def process_savings(self):
+        if self.next_saving_process_date is None:
+            # Set to the first of next month
+            self.next_saving_process_date \
+                = first_day_of_month(date.today() + relativedelta(months=1))
+            db.session.commit()
+
+        elif self.next_saving_process_date <= date.today():
+            for outgoing in self.outgoings:
+                outgoing.pay_linked_saving(self.next_saving_process_date)
+            # Once done, set next process date to 1st of next month
+            self.next_saving_process_date \
+                = first_day_of_month(date.today() + relativedelta(months=1))
+            db.session.commit()
+
     @classmethod
-    def login(cls, username, password, session):
+    def login(cls, username, password, remember, session):
         user = User.query.filter_by(username=username).first()
 
         if user is None:
@@ -95,6 +116,9 @@ class User(db.Model):
             session['user_id'] = user.id
             session['last_activity'] = \
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            session['remember'] = checkbox_to_boolean(remember)
+
+            user.process_savings()
 
             return True, ""
 
@@ -110,7 +134,7 @@ class User(db.Model):
         if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
                 < (datetime.now() - relativedelta(
                     minutes=LOGIN_TIMEOUT_MINUTES
-                )):
+                )) and session['remember'] is False:
             return True
         else:
             session['last_activity'] = \
@@ -131,8 +155,25 @@ class User(db.Model):
         total_outgoings = 0
         for outgoing in self.outgoings:
             if outgoing.is_current(month_offset=month_offset):
-                total_outgoings = total_outgoings + outgoing.value
+                total_outgoings += outgoing.value
         return total_outgoings
+
+    @property
+    def total_savings(self):
+        """The total value of all of the users monthly savings."""
+        total_savings = 0
+        for saving in self.savings:
+            total_savings += saving.balance
+        return total_savings
+
+    @property
+    def outstanding_self_loan_value(self):
+        """The total self loan value yet to re-pay."""
+        outstanding_self_loan_value = 0
+        for outgoing in self.outgoings:
+            if outgoing.is_self_loan:
+                outstanding_self_loan_value += outgoing.payments_left_total
+        return outstanding_self_loan_value
 
     @property
     def weekly_spending_calculations(self):
@@ -294,16 +335,25 @@ class Outgoing(db.Model):
     )
     start_month = db.Column(db.Date)
     end_month = db.Column(db.Date)
+    linked_saving_id = db.Column(
+        db.Integer,
+        db.ForeignKey('saving.id')
+    )
+    is_self_loan = db.Column(db.Boolean, nullable=False)
+    linked_saving_last_update = db.Column(db.Date)
     notes = db.Column(db.String(8000))
 
     def __init__(self, user_id, name, value, account_id, start_month=None,
-                 end_month=None, notes=None):
+                 end_month=None, linked_saving_id=None, is_self_loan=False,
+                 notes=None):
         self.user_id = user_id
         self.name = name
         self.value = value
         self.account_id = account_id
         self.start_month = start_month
         self.end_month = end_month
+        self.linked_saving_id = linked_saving_id
+        self.is_self_loan = is_self_loan
         self.notes = notes
 
     @property
@@ -372,11 +422,28 @@ class Outgoing(db.Model):
             return month_count(self.start_month, self.end_month)
 
     @property
+    def months_paid_left(self):
+        if self.start_month is None or self.end_month is None:
+            return 0  # Not desinged to be used without start and end dates
+        else:
+            return month_count(
+                date.today() + relativedelta(months=1),
+                self.end_month
+            )
+
+    @property
     def payments_total(self):
         if self.start_month is None or self.end_month is None:
             return 0  # Not desinged to be used without start and end dates
         else:
             return self.value * self.months_paid
+
+    @property
+    def payments_left_total(self):
+        if self.start_month is None or self.end_month is None:
+            return 0  # Not desinged to be used without start and end dates
+        else:
+            return self.value * self.months_paid_left
 
     @property
     def date_tooltip(self):
@@ -407,13 +474,57 @@ class Outgoing(db.Model):
 {start} {self.start_month_friendly}\n\
 {end} {self.end_month_friendly}\n\
 \n\
-{self.months_paid} payment(s) totaling £{self.payments_total:.2f}"
+{self.months_paid} payment(s) overall totaling £{self.payments_total:,.2f}\n\
+{self.months_paid_left} payment(s) left totaling £{self.payments_left_total:,.2f}"  # noqa
         elif self.start_month is not None:
             # Start Month Only
             return f"{start} {self.start_month_friendly}"
         else:
             # End Month Only
             return f"{end} {self.end_month_friendly}"
+
+    def pay_linked_saving(self, start_date):
+        if self.linked_saving_id is None:
+            # No linked saving
+            return
+
+        if self.end_month is not None and self.end_month < start_date:
+            # Outgoing ended
+            return
+
+        saving = Saving.query.get(self.linked_saving_id)
+
+        todays_date = date.today()
+        one_month = relativedelta(months=1)
+        loop_date = start_date
+
+        while loop_date <= todays_date:
+            # Check start date
+            if self.start_month is None:
+                started = True
+            elif loop_date >= self.start_month:
+                started = True
+            else:
+                started = False
+
+            # Check end date
+            if self.end_month is None:
+                not_ended = True
+            elif loop_date <= self.end_month:
+                not_ended = True
+            else:
+                not_ended = False
+
+            # Pay saving account
+            if started and not_ended:
+                saving.balance += self.value
+
+            if not_ended is False:
+                break
+            else:
+                loop_date += one_month
+
+        db.session.commit()
 
 
 class AnnualExpense(db.Model):
@@ -515,6 +626,34 @@ class AnnualExpense(db.Model):
             return
 
 
+class Saving(db.Model):
+    __tablename__ = "saving"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    balance = db.Column(db.Numeric, nullable=False)
+    last_manual_update = db.Column(db.Date, nullable=False)
+    notes = db.Column(db.String(8000))
+    linked_outgoings = db.relationship(
+        "Outgoing", backref="linked_saving", lazy=True
+    )
+
+    def __init__(self, user_id, name, balance=0, notes=None):
+        self.user_id = user_id
+        self.name = name
+        self.balance = balance
+        self.last_manual_update = date.today()
+        self.notes = notes
+
+    @property
+    def needs_balance_update(self):
+        if self.last_manual_update < (date.today() - relativedelta(months=2)):
+            return True
+        else:
+            return False
+
+
 db.create_all()
 # endregion
 
@@ -535,6 +674,7 @@ def login_handler():
     login_result = User.login(
         request.form['username'],
         request.form['password'],
+        request.form.get('remember'),
         session
     )
     if login_result[0] is not True:
@@ -547,7 +687,7 @@ def login_handler():
 
 @app.route("/logout")
 def logout():
-    session.pop('username', None)
+    session.clear()
     return redirect(url_for('login'))
 # endregion
 
@@ -588,13 +728,13 @@ def get_starling_data():
     user = User.query.get(session['user_id'])
 
     data = {
-        "Main Balance": "£ {:.2f}".format(
+        "Main Balance": "£ {:,.2f}".format(
             user.starling_account.effective_balance
         )
     }
     for uid, savings_goal in user.starling_account.savings_goals.items():
         data[savings_goal.name] \
-            = "£ {:.2f}".format(savings_goal.total_saved_minor_units / 100)
+            = "£ {:,.2f}".format(savings_goal.total_saved_minor_units / 100)
 
     return jsonify(data)
 # endregion
@@ -811,6 +951,8 @@ def new_outgoing_handler():
             form_data['end_month'],
             set_to_last_day=True
         ),
+        linked_saving_id=form_data.get('linked_saving_id'),
+        is_self_loan=checkbox_to_boolean(form_data.get('is_self_loan')),
         notes=form_data['notes']
     ))
     db.session.commit()
@@ -853,6 +995,10 @@ def edit_outgoing_handler(outgoing_id):
     outgoing.start_month = month_input_to_date(form_data.get('start_month'))
     outgoing.end_month = \
         month_input_to_date(form_data.get('end_month'), set_to_last_day=True)
+
+    outgoing.linked_saving_id = form_data.get('linked_saving_id')
+    outgoing.is_self_loan = checkbox_to_boolean(form_data.get('is_self_loan'))
+
     outgoing.notes = form_data['notes']
 
     db.session.commit()
@@ -990,5 +1136,105 @@ def delete_annual_expense_handler(annual_expense_id):
     AnnualExpense.update_user_annual_expense_outgoing(user)
 
     return redirect(url_for('annual_expenses'))
+# endregion
+
+
+# region Savings / Pension
+@app.route("/savings")
+def savings():
+    if User.login_required(session):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+
+    return render_template(
+        'savings.html',
+        user=user
+    )
+
+
+@app.route("/new-savings")
+def new_saving():
+    if User.login_required(session):
+        return redirect(url_for('login'))
+
+    return render_template('new-saving.html')
+
+
+@app.route("/new-saving-handler", methods=['POST'])
+def new_saving_handler():
+    if User.login_required(session):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+
+    form_data = empty_strings_to_none(request.form)
+
+    db.session.add(Saving(
+        user.id,
+        form_data['name'],
+        form_data['balance'],
+        form_data['notes']
+    ))
+    db.session.commit()
+
+    return redirect(url_for('savings'))
+
+
+@app.route("/edit-saving/<saving_id>")
+def edit_saving(saving_id):
+    if User.login_required(session):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+
+    return render_template(
+        'edit-saving.html',
+        saving=Saving.query.filter_by(
+            user_id=user.id,
+            id=saving_id,
+        ).first()
+    )
+
+
+@app.route("/edit-saving-handler/<saving_id>", methods=['POST'])
+def edit_saving_handler(saving_id):
+    if User.login_required(session):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+
+    form_data = empty_strings_to_none(request.form)
+
+    saving = Saving.query.filter_by(
+        user_id=user.id,
+        id=saving_id,
+    ).first()
+
+    saving.name = form_data['name']
+
+    if int(saving.balance * 100) != int(float(form_data['balance']) * 100):
+        saving.balance = form_data['balance']
+        saving.last_manual_update = date.today()
+
+    saving.notes = form_data['notes']
+
+    db.session.commit()
+
+    return redirect(url_for('savings'))
+
+
+@app.route("/delete-saving-handler/<saving_id>")
+def delete_saving_handler(saving_id):
+    if User.login_required(session):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+
+    saving = Saving.query.filter_by(
+        user_id=user.id,
+        id=saving_id,
+    ).first()
+
+    db.session.delete(saving)
+
+    db.session.commit()
+
+    return redirect(url_for('savings'))
 # endregion
 # endregion

@@ -18,12 +18,41 @@
     
     <span class="input-label">Value</span>
     £ <input type="number" name="value" step="0.01" min="0" required>
-  
+
     <span class="input-label">First Month Paid</span>
-    <input type="month" name="start_month">
+    <input type="month" id="start_month" name="start_month">
 
     <span class="input-label">Last Month Paid</span>
-    <input type="month" name="end_month">
+    <input type="month" id="end_month" name="end_month">
+
+    <br>
+    <br><input type="checkbox" id="saving_checkbox" onchange="outgoing_saving_checkbox_handle();"><span class="bold"> Link to Saving</span>
+    <span class="mdi mdi-help-circle-outline color-inherit" title=
+"Linking a monthly outgoing to a savings account
+will increase the balance of the savings account
+by the outgoings value every month.
+
+Optionally you can class the outgoing as a self
+loan to keep track of how much you owe your 
+savings. Self loans require the outgoing to have
+a start and an end date."
+    ></span>
+    <div id="saving_checkbox_content" class="section-border" style="display: none;">
+
+      <span class="input-label">Saving</span>
+      <select id="saving_id" name="linked_saving_id">
+        <option value=""></option>
+        {% for saving in user.savings %}
+          <option value="{{ saving.id }}">{{ saving.name }}</option>
+        {% endfor %}
+      </select>
+      <br>
+
+      <input type="checkbox" id="self_loan_checkbox" name="is_self_loan" onchange="self_loan_checkbox_handle();">
+      <span id="self_loan_checkbox_span" class="bold"> Self Loan</span>
+    </div>
+    <br>
+    <br>
     
     <span class="input-label">Notes</span>
     <textarea name="notes"></textarea>
