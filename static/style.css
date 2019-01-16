@@ -353,9 +353,16 @@ textarea {
 
 .navbar li a {
     display: block;
-    color: rgb(209, 209, 209);
+    color: white;
     padding: 16px 16px 16px 16px;
     font-size: 20px;
+}
+.navbar li a:hover {
+    color: rgb(199, 199, 199);
+}
+.navbar li a.current-page {
+    color: white;
+    background-color: #536e94;
 }
 
 .navbar ul li:last-child {
@@ -370,15 +377,6 @@ textarea {
 
 .navbar .mdi {
     margin: 0 10px 0 0;
-}
-
-.navbar li a:hover {
-    color: white;
-}
-
-.navbar li a.current-page {
-    color: white;
-    font-weight: bold;
 }
 
 .navbar-banner {
