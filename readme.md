@@ -24,6 +24,10 @@ It was designed with the following methodology in mind.
 * Multiple User Support - Multiple users can each have their own password protected set of data.
 * Mobile Responsive.
 
+## Change Log
+24/02/2019
+* Fixed session expiry.
+
 ## Installation
 This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/).
 

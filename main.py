@@ -6,7 +6,7 @@ from helpers import empty_strings_to_none, demo_starling_account, \
     months, next_month, current_month_num, \
     spending_money_savings_target_balance, month_input_to_date, \
     date_to_month_input, month_count, checkbox_to_boolean, first_day_of_month
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from os import environ, urandom
 from starlingbank import StarlingAccount
@@ -29,11 +29,13 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+# Define "permanent" as 1 year and not the default 31 days
+app.permanent_session_lifetime = timedelta(days=365)
+
 
 # region Database
 class User(db.Model):
     __tablename__ = "user"
-    _failed_login_attempts = 0
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
@@ -112,6 +114,9 @@ class User(db.Model):
         else:
             user.failed_login_attempts = 0
             db.session.commit()
+
+            # Stop the session from expiring when the browser closes
+            session.permanent = True
 
             session['user_id'] = user.id
             session['last_activity'] = \
