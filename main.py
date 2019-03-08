@@ -10,6 +10,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from os import environ, urandom
 from starlingbank import StarlingAccount
+from functools import wraps
 
 LOGIN_TIMEOUT_MINUTES = 30
 MAX_FAILED_LOGIN_ATTEMPTS = 3
@@ -128,23 +129,27 @@ class User(db.Model):
             return True, ""
 
     @classmethod
-    def login_required(cls, session):
-        """Carries out a number of checks and returns True if the user needs
-        to log in again.
+    def login_required(cls, func):
+        """A decorator to go around routes that require login. If login is
+        required a redirect to the login page is returned and the original
+        function is not executed.
         """
-        if 'user_id' not in session:
-            return True
-        if 'last_activity' not in session:
-            return True
-        if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
-                < (datetime.now() - relativedelta(
-                    minutes=LOGIN_TIMEOUT_MINUTES
-                )) and session['remember'] is False:
-            return True
-        else:
-            session['last_activity'] = \
-                datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            return False
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if 'user_id' not in session:
+                return redirect(url_for('login'))
+            if 'last_activity' not in session:
+                return redirect(url_for('login'))
+            if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
+                    < (datetime.now() - relativedelta(
+                        minutes=LOGIN_TIMEOUT_MINUTES
+                    )) and session['remember'] is False:
+                return redirect(url_for('login'))
+            else:
+                session['last_activity'] = \
+                    datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                return func(*args, **kwargs)
+        return wrapped_func
 
     def configuration_required(self):
         """Checks to see if the user has completed configuration and returns
@@ -728,9 +733,8 @@ def logout():
 
 # region Index
 @app.route("/")
+@User.login_required
 def index():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     if user.configuration_required():
@@ -756,9 +760,8 @@ def index():
 
 # region Starling Integration
 @app.route("/get-starling-data")
+@User.login_required
 def get_starling_data():
-    if User.login_required(session):
-        return "Session Expired!", 401
     user = User.query.get(session['user_id'])
 
     data = {
@@ -776,9 +779,8 @@ def get_starling_data():
 
 # region Configuration
 @app.route("/configuration")
+@User.login_required
 def configuration():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -788,9 +790,8 @@ def configuration():
 
 
 @app.route("/configuration-handler", methods=['POST'])
+@User.login_required
 def configuration_handler():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -844,9 +845,8 @@ def configuration_handler():
 
 # region Accounts
 @app.route("/accounts")
+@User.login_required
 def accounts():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -856,17 +856,14 @@ def accounts():
 
 
 @app.route("/new-account")
+@User.login_required
 def new_account():
-    if User.login_required(session):
-        return redirect(url_for('login'))
-
     return render_template('new-account.html')
 
 
 @app.route("/new-account-handler", methods=['POST'])
+@User.login_required
 def new_account_handler():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -882,9 +879,8 @@ def new_account_handler():
 
 
 @app.route("/edit-account/<account_id>")
+@User.login_required
 def edit_account(account_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -897,9 +893,8 @@ def edit_account(account_id):
 
 
 @app.route("/edit-account-handler/<account_id>", methods=['POST'])
+@User.login_required
 def edit_account_handler(account_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -918,9 +913,8 @@ def edit_account_handler(account_id):
 
 
 @app.route("/delete-account-handler/<account_id>")
+@User.login_required
 def delete_account_handler(account_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     account = Account.query.filter_by(
@@ -936,9 +930,8 @@ def delete_account_handler(account_id):
 
 # region Montly Outgoings
 @app.route("/outgoings")
+@User.login_required
 def outgoings():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -949,9 +942,8 @@ def outgoings():
 
 
 @app.route("/new-outgoing")
+@User.login_required
 def new_outgoing():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     # Note: This does no harm if the id is another users. It's only used to
@@ -966,9 +958,8 @@ def new_outgoing():
 
 
 @app.route("/new-outgoing-handler", methods=['POST'])
+@User.login_required
 def new_outgoing_handler():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -993,9 +984,8 @@ def new_outgoing_handler():
 
 
 @app.route("/edit-outgoing/<outgoing_id>")
+@User.login_required
 def edit_outgoing(outgoing_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1009,9 +999,8 @@ def edit_outgoing(outgoing_id):
 
 
 @app.route("/edit-outgoing-handler/<outgoing_id>", methods=['POST'])
+@User.login_required
 def edit_outgoing_handler(outgoing_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -1039,9 +1028,8 @@ def edit_outgoing_handler(outgoing_id):
 
 
 @app.route("/delete-outgoing-handler/<outgoing_id>")
+@User.login_required
 def delete_outgoing_handler(outgoing_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     outgoing = Outgoing.query.filter_by(
@@ -1057,9 +1045,8 @@ def delete_outgoing_handler(outgoing_id):
 
 # region Annual Expenses
 @app.route("/annual-expenses")
+@User.login_required
 def annual_expenses():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1070,9 +1057,8 @@ def annual_expenses():
 
 
 @app.route("/new-annual-expense")
+@User.login_required
 def new_annual_expense():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1083,9 +1069,8 @@ def new_annual_expense():
 
 
 @app.route("/new-annual-expense-handler", methods=['POST'])
+@User.login_required
 def new_annual_expense_handler():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -1105,9 +1090,8 @@ def new_annual_expense_handler():
 
 
 @app.route("/edit-annual-expense/<annual_expense_id>")
+@User.login_required
 def edit_annual_expense(annual_expense_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1124,9 +1108,8 @@ def edit_annual_expense(annual_expense_id):
 @app.route("/edit-annual-expense-handler/<annual_expense_id>",
            methods=['POST']
            )
+@User.login_required
 def edit_annual_expense_handler(annual_expense_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -1149,9 +1132,8 @@ def edit_annual_expense_handler(annual_expense_id):
 
 
 @app.route("/delete-annual-expense-handler/<annual_expense_id>")
+@User.login_required
 def delete_annual_expense_handler(annual_expense_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     annual_expense = AnnualExpense.query.filter_by(
@@ -1169,9 +1151,8 @@ def delete_annual_expense_handler(annual_expense_id):
 
 # region Savings / Pension
 @app.route("/savings")
+@User.login_required
 def savings():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1181,17 +1162,14 @@ def savings():
 
 
 @app.route("/new-savings")
+@User.login_required
 def new_saving():
-    if User.login_required(session):
-        return redirect(url_for('login'))
-
     return render_template('new-saving.html')
 
 
 @app.route("/new-saving-handler", methods=['POST'])
+@User.login_required
 def new_saving_handler():
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -1208,9 +1186,8 @@ def new_saving_handler():
 
 
 @app.route("/edit-saving/<saving_id>")
+@User.login_required
 def edit_saving(saving_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     return render_template(
@@ -1223,9 +1200,8 @@ def edit_saving(saving_id):
 
 
 @app.route("/edit-saving-handler/<saving_id>", methods=['POST'])
+@User.login_required
 def edit_saving_handler(saving_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     form_data = empty_strings_to_none(request.form)
@@ -1249,9 +1225,8 @@ def edit_saving_handler(saving_id):
 
 
 @app.route("/delete-saving-handler/<saving_id>")
+@User.login_required
 def delete_saving_handler(saving_id):
-    if User.login_required(session):
-        return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
 
     saving = Saving.query.filter_by(
