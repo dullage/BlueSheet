@@ -2,6 +2,11 @@
 import math
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from base64 import urlsafe_b64encode
+from cryptography.fernet import Fernet
+import json
 
 ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(math.floor(n/10)%10!=1)*(n%10<4)*n%10::4])  # noqa
 
@@ -281,3 +286,40 @@ def checkbox_to_boolean(value):
         return True
     else:
         return False
+
+
+def key(password, salt=""):
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update((password + salt).encode())
+    key = urlsafe_b64encode(digest.finalize())
+    return key
+
+
+def encrypt(value, key):
+    if value is None:
+        return None
+
+    f = Fernet(key)
+
+    encrypted_value = f.encrypt(
+        json.dumps(
+            {"value": value}
+        ).encode()
+    )
+
+    return encrypted_value
+
+
+def decrypt(encrypted_value, key):
+    if encrypted_value is None:
+        return None
+
+    f = Fernet(key)
+
+    value = json.loads(
+        f.decrypt(
+            encrypted_value
+        ).decode()
+    )["value"]
+
+    return value

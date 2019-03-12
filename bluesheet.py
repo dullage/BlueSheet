@@ -1,5 +1,6 @@
 import click
-from main import db, User
+from main import db, User, PASSWORD_SALT
+from helpers import key
 
 
 @click.group()
@@ -11,6 +12,8 @@ def cli():
 @click.option("--username", "-u")
 @click.option("--password", "-p")
 def add_user(username, password):
+    password = key(password, PASSWORD_SALT)
+
     db.session.add(User(
         username=username,
         password=password

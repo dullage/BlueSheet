@@ -16,9 +16,20 @@ app = Flask(__name__)
 
 # If the environment variable SECRET_KEY is not set a new secret key will be
 # generated each time the app starts. Note: This invaldates any existing
-# sessions.
-app.secret_key \
-    = environ.get("SECRET_KEY", urandom(16))
+# session cookies.
+SESSION_KEY = environ.get("SESSION_KEY", urandom(16))
+
+PASSWORD_SALT = environ.get("PASSWORD_SALT")
+if PASSWORD_SALT is None:
+    print("Environment Variable PASSWORD_SALT not set!")
+    exit(1)
+
+ENCRYPTION_KEY_SALT = environ.get("ENCRYPTION_KEY_SALT")
+if ENCRYPTION_KEY_SALT is None:
+    print("Environment Variable ENCRYPTION_KEY_SALT not set!")
+    exit(1)
+
+app.secret_key = SESSION_KEY
 
 app.config["SQLALCHEMY_DATABASE_URI"] \
     = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
@@ -36,8 +47,8 @@ class User(db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), nullable=False, unique=True)
-    password = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String, nullable=False, unique=True)
+    password = db.Column(db.String, nullable=False)
     failed_login_attempts = db.Column(db.Integer, nullable=False)
     locked = db.Column(db.Boolean, nullable=False)
     next_saving_process_date = db.Column(db.Date)
@@ -103,7 +114,7 @@ class User(db.Model):
             return False, "Login failed, please try again."
         elif user.locked:
             return False, "Account locked, please contact your administrator."
-        elif user.password != password:
+        elif h.key(password, PASSWORD_SALT) != user.password:
             user.failed_login_attempts += 1
             if user.failed_login_attempts >= MAX_FAILED_LOGIN_ATTEMPTS:
                 user.locked = True
