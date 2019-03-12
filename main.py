@@ -2,10 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for, \
     session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from helpers import empty_strings_to_none, demo_starling_account, \
-    months, next_month, current_month_num, \
-    spending_money_savings_target_balance, month_input_to_date, \
-    date_to_month_input, month_count, checkbox_to_boolean, first_day_of_month
+import helpers as h
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from os import environ, urandom
@@ -87,7 +84,7 @@ class User(db.Model):
         if self.next_saving_process_date is None:
             # Set to the first of next month
             self.next_saving_process_date \
-                = first_day_of_month(date.today() + relativedelta(months=1))
+                = h.first_day_of_month(date.today() + relativedelta(months=1))
             db.session.commit()
 
         elif self.next_saving_process_date <= date.today():
@@ -95,7 +92,7 @@ class User(db.Model):
                 outgoing.pay_linked_saving(self.next_saving_process_date)
             # Once done, set next process date to 1st of next month
             self.next_saving_process_date \
-                = first_day_of_month(date.today() + relativedelta(months=1))
+                = h.first_day_of_month(date.today() + relativedelta(months=1))
             db.session.commit()
 
     @classmethod
@@ -122,7 +119,7 @@ class User(db.Model):
             session['user_id'] = user.id
             session['last_activity'] = \
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            session['remember'] = checkbox_to_boolean(remember)
+            session['remember'] = h.checkbox_to_boolean(remember)
 
             user.process_savings()
 
@@ -140,7 +137,8 @@ class User(db.Model):
                 return redirect(url_for('login'))
             if 'last_activity' not in session:
                 return redirect(url_for('login'))
-            if datetime.strptime(session['last_activity'], '%Y-%m-%d %H:%M:%S') \
+            if datetime.strptime(
+                session['last_activity'], '%Y-%m-%d %H:%M:%S') \
                     < (datetime.now() - relativedelta(
                         minutes=LOGIN_TIMEOUT_MINUTES
                     )) and session['remember'] is False:
@@ -187,7 +185,7 @@ class User(db.Model):
 
     @property
     def weekly_spending_calculations(self):
-        return spending_money_savings_target_balance(
+        return h.spending_money_savings_target_balance(
             self.configuration.weekly_pay_day,
             self.configuration.weekly_spending_amount
         )
@@ -197,7 +195,7 @@ class User(db.Model):
         if self.configuration.starling_api_key is None:
             return None
         elif self.username == "demo":
-            return demo_starling_account
+            return h.demo_starling_account
         else:
             try:
                 return StarlingAccount(
@@ -374,11 +372,11 @@ class Outgoing(db.Model):
 
     @property
     def start_month_input_string(self):
-        return date_to_month_input(self.start_month)
+        return h.date_to_month_input(self.start_month)
 
     @property
     def end_month_input_string(self):
-        return date_to_month_input(self.end_month)
+        return h.date_to_month_input(self.end_month)
 
     @property
     def start_month_friendly(self):
@@ -435,14 +433,14 @@ class Outgoing(db.Model):
         if self.start_month is None or self.end_month is None:
             return 0  # Not desinged to be used without start and end dates
         else:
-            return month_count(self.start_month, self.end_month)
+            return h.month_count(self.start_month, self.end_month)
 
     @property
     def months_paid_left(self):
         if self.start_month is None or self.end_month is None:
             return 0  # Not desinged to be used without start and end dates
         else:
-            return month_count(
+            return h.month_count(
                 date.today() + relativedelta(months=1),
                 self.end_month
             )
@@ -603,11 +601,11 @@ class AnnualExpense(db.Model):
         negative amount is returned as a positive current target balance.
         """
         monthly_saving = cls.monthly_saving(user)
-        current_month = current_month_num()
+        current_month = h.current_month_num()
 
         # Start the simulation next month as the presumption is that this
         # month has already been saved and spent.
-        working_month = next_month(current_month)
+        working_month = h.next_month(current_month)
         ending_month = current_month
 
         working_balance = 0
@@ -632,7 +630,7 @@ class AnnualExpense(db.Model):
             if working_month == ending_month:
                 break
             else:
-                working_month = next_month(working_month)
+                working_month = h.next_month(working_month)
 
         return -lowest_balance
 
@@ -740,7 +738,7 @@ def index():
     if user.configuration_required():
         return redirect(url_for('configuration'))
 
-    current_month = current_month_num()
+    current_month = h.current_month_num()
     current_month_annual_expenses = AnnualExpense.by_month_range(
         user,
         current_month,
@@ -794,7 +792,7 @@ def configuration():
 def configuration_handler():
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     form_data['month_start_date'] = 28  # Hardcode for now.
 
@@ -866,7 +864,7 @@ def new_account():
 def new_account_handler():
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     db.session.add(Account(
         user.id,
@@ -897,7 +895,7 @@ def edit_account(account_id):
 def edit_account_handler(account_id):
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     account = Account.query.filter_by(
         user_id=user.id,
@@ -962,20 +960,20 @@ def new_outgoing():
 def new_outgoing_handler():
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     db.session.add(Outgoing(
         user.id,
         form_data['name'],
         form_data['value'],
         form_data['account_id'],
-        start_month=month_input_to_date(form_data['start_month']),
-        end_month=month_input_to_date(
+        start_month=h.month_input_to_date(form_data['start_month']),
+        end_month=h.month_input_to_date(
             form_data['end_month'],
             set_to_last_day=True
         ),
         linked_saving_id=form_data.get('linked_saving_id'),
-        is_self_loan=checkbox_to_boolean(form_data.get('is_self_loan')),
+        is_self_loan=h.checkbox_to_boolean(form_data.get('is_self_loan')),
         notes=form_data['notes']
     ))
     db.session.commit()
@@ -1003,7 +1001,7 @@ def edit_outgoing(outgoing_id):
 def edit_outgoing_handler(outgoing_id):
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     outgoing = Outgoing.query.filter_by(
         user_id=user.id,
@@ -1013,12 +1011,13 @@ def edit_outgoing_handler(outgoing_id):
     outgoing.account_id = form_data['account_id']
     outgoing.name = form_data['name']
     outgoing.value = form_data['value']
-    outgoing.start_month = month_input_to_date(form_data.get('start_month'))
+    outgoing.start_month = h.month_input_to_date(form_data.get('start_month'))
     outgoing.end_month = \
-        month_input_to_date(form_data.get('end_month'), set_to_last_day=True)
+        h.month_input_to_date(form_data.get('end_month'), set_to_last_day=True)
 
     outgoing.linked_saving_id = form_data.get('linked_saving_id')
-    outgoing.is_self_loan = checkbox_to_boolean(form_data.get('is_self_loan'))
+    outgoing.is_self_loan = h.checkbox_to_boolean(
+        form_data.get('is_self_loan'))
 
     outgoing.notes = form_data['notes']
 
@@ -1052,7 +1051,7 @@ def annual_expenses():
     return render_template(
         'annual-expenses.html',
         user=user,
-        months=months
+        months=h.months
     )
 
 
@@ -1064,7 +1063,7 @@ def new_annual_expense():
     return render_template(
         'new-annual-expense.html',
         user=user,
-        months=months
+        months=h.months
     )
 
 
@@ -1073,7 +1072,7 @@ def new_annual_expense():
 def new_annual_expense_handler():
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     db.session.add(AnnualExpense(
         user.id,
@@ -1101,7 +1100,7 @@ def edit_annual_expense(annual_expense_id):
             user_id=user.id,
             id=annual_expense_id
         ).first(),
-        months=months
+        months=h.months
     )
 
 
@@ -1112,7 +1111,7 @@ def edit_annual_expense(annual_expense_id):
 def edit_annual_expense_handler(annual_expense_id):
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     annual_expense = AnnualExpense.query.filter_by(
         user_id=user.id,
@@ -1172,7 +1171,7 @@ def new_saving():
 def new_saving_handler():
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     db.session.add(Saving(
         user.id,
@@ -1204,7 +1203,7 @@ def edit_saving(saving_id):
 def edit_saving_handler(saving_id):
     user = User.query.get(session['user_id'])
 
-    form_data = empty_strings_to_none(request.form)
+    form_data = h.empty_strings_to_none(request.form)
 
     saving = Saving.query.filter_by(
         user_id=user.id,
