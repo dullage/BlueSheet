@@ -28,86 +28,49 @@ It was designed with the following methodology in mind.
 24/02/2019
 * Fixed session expiry.
 
+14/03/2019
+* Fixed an issue loading existing Weekly Pay Day config.
+* Sensitive data is now stored as encrypted binary (see below).
+
+## Data Encryption
+The following data is stored as encrypted binary. The key to decrypt the data is generated on the server using the user password but is stored locally to the user in a cookie (and not on the server). Equally the password is not stored on the server either (only an irreversable hash). 
+
+Barring a man-in-the-middle attack, only the end user will ever be able to see this data.
+
+* Account: Names
+* Account: Notes
+* Configuration: Annual Gross Salary
+* Configuration: Annual Tax Allowance
+* Configuration: Tax Rate
+* Configuration: Annual NI Allowance
+* Configuration: NI Rate
+* Configuration: Annual Non Pensionable Value
+* Configuration: Pension Contribution
+* Configuration: Weekly Spending Amount
+* Configuration: Starling API Key
+* Monthly Outgoing: Names
+* Monthly Outgoing: Values
+* Monthly Outgoing: Notes
+* Annual Expense: Names
+* Annual Expense: Values
+* Annual Expense: Notes
+* Savings: Names
+* Savings: Balance
+* Savings: Notes
+
 ## Installation
-This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/).
+This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/). I personally run this in a [Docker](https://www.docker.com/) container using [Gunicorn](https://gunicorn.org/). This is then served by [Caddy Web Server](https://caddyserver.com/).
 
-The easiest way I have found is to run the app in a Docker container using tiangolo's great [uwsgi-nginx-flask image](https://hub.docker.com/r/tiangolo/uwsgi-nginx-flask). docker-compose can also be used to help things.
-
-Linux Steps:
+# Creating a user account
+bluesheet.py is a command line tool allowing you to add and unlock user accounts. Usage:
 ```shell
-# Create an installation directory
-mkdir BlueSheet
-cd BlueSheet
-
-# Clone the repo
-git clone https://github.com/Dullage/BlueSheet.git
-
-# Create a docker and docker-compose file
-touch dockerfile
-touch docker-compose.yaml
-
-# Create an empty database file
-touch BlueSheet.db
-```
-You should now have an installation directory that looks like this:
-* **BlueSheet**
-    * docker
-    * docker-compose.yaml
-    * BlueSheet.db
-    * **BlueSheet**
-        * **static**
-        * **templates**
-        * .gitattributes
-        * ...
-
-Next open the docker and docker-compose files for editing and add the following (changing variables where necessary).
-
-```dockerfile
-# dockerfile
-FROM tiangolo/uwsgi-nginx-flask:python3.6
-
-COPY ./BlueSheet /app
-
-RUN pip install -r /app/requirements.txt
-```
-```yaml
-# docker-compose.yaml
-version: '3'
-services:
-  bluesheet:
-    build: .
-    image: bluesheet
-    container_name: "bluesheet"
-    # Keep the database outside the container
-    volumes:
-      - "./BlueSheet.db:/app_data/BlueSheet.db"
-    # Tell BlueSheet where to find the database
-    environment:
-      - DATABASE_PATH=/app_data/BlueSheet.db
-      # - "SECRET_KEY=<Secure Password>" # Optional, will be generated on each start if unset.
-    # Run on local port 5000
-    ports:
-      - 5000:80
-    restart: "always"
-```
-Once created, start the app with the following command:
-```shell
-docker-compose up -d
-```
-You should now be able to navigate to the login screen at the IP address of the host machine on port 5000.
-
-Now you need to create a user, you can do this from the shell within the docker container:
-```shell
-# Open a shell in the docker container
-command docker exec -it bluesheet /bin/bash
-
-# Create a user
-python /app/bluesheet.py add-user -u joe.bloggs@example.com -p MyS3curePwd!
+python /path/to/bluesheet.py add-user -u joe.bloggs@example.com -p MyS3curePwd!
 ```
 
 When the user first logs in they will be taken to the configuration page.
 
-If a user enters an incorrect password more than 3 times in a row their account will be locked, to unlock an account you can run the following (again from within the docker container):
+# Unlokcing a user account
+If a user enters an incorrect password more than 3 times in a row their account will be locked, to unlock an account you can run the following:
 ```shell
-python /app/bluesheet.py unlock-user -u joe.bloggs@example.com
+python /path/to/bluesheet.py unlock-user -u joe.bloggs@example.com
 ```
