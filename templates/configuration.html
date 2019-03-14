@@ -39,13 +39,13 @@
     <h2>Weekly Spending Money</h2>
     <span class="input-label">Weekly Pay Day</span>
     <select name="weekly_pay_day" required>
-        <option value="0" {% if user.configuration.weekly_pay_day == '0' %}selected{% endif %}>Monday</option>
-        <option value="1" {% if user.configuration.weekly_pay_day == '1' %}selected{% endif %}>Tuesday</option>
-        <option value="2" {% if user.configuration.weekly_pay_day == '2' %}selected{% endif %}>Wednesday</option>
-        <option value="3" {% if user.configuration.weekly_pay_day == '3' %}selected{% endif %}>Thursday</option>
-        <option value="4" {% if user.configuration.weekly_pay_day == '4' %}selected{% endif %}>Friday</option>
-        <option value="5" {% if user.configuration.weekly_pay_day == '5' %}selected{% endif %}>Saturday</option>
-        <option value="6" {% if user.configuration.weekly_pay_day == '6' %}selected{% endif %}>Sunday</option>
+        <option value="0" {% if user.configuration.weekly_pay_day == 0 %}selected{% endif %}>Monday</option>
+        <option value="1" {% if user.configuration.weekly_pay_day == 1 %}selected{% endif %}>Tuesday</option>
+        <option value="2" {% if user.configuration.weekly_pay_day == 2 %}selected{% endif %}>Wednesday</option>
+        <option value="3" {% if user.configuration.weekly_pay_day == 3 %}selected{% endif %}>Thursday</option>
+        <option value="4" {% if user.configuration.weekly_pay_day == 4 %}selected{% endif %}>Friday</option>
+        <option value="5" {% if user.configuration.weekly_pay_day == 5 %}selected{% endif %}>Saturday</option>
+        <option value="6" {% if user.configuration.weekly_pay_day == 6 %}selected{% endif %}>Sunday</option>
     </select>
 
     <span class="input-label">Weekly Spending Amount</span>
