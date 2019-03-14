@@ -31,6 +31,7 @@ It was designed with the following methodology in mind.
 14/03/2019
 * Fixed an issue loading existing Weekly Pay Day config.
 * Sensitive data is now stored as encrypted binary (see below).
+* Delete warnings now include the name of the item being deleted (for confirmation).
 
 ## Data Encryption
 The following data is stored as encrypted binary. The key to decrypt the data is generated on the server using the user password but is stored locally to the user in a cookie (and not on the server). Equally the password is not stored on the server either (only an irreversable hash). 
