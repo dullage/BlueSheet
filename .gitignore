@@ -116,6 +116,3 @@ dmypy.json
 # Custom
 .vscode/
 *.db
-BlueSheet.url
-notes.txt
-test.py
