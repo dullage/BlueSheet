@@ -287,8 +287,8 @@ def checkbox_to_boolean(value):
         return False
 
 
-def key(password, salt=""):
+def hash(value, salt=""):
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-    digest.update((password + salt).encode())
-    key = urlsafe_b64encode(digest.finalize())
-    return key
+    digest.update((value + salt).encode())
+    hased_value = urlsafe_b64encode(digest.finalize())
+    return hased_value

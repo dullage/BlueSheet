@@ -30,48 +30,37 @@ It was designed with the following methodology in mind.
 
 14/03/2019
 * Fixed an issue loading existing Weekly Pay Day config.
-* Sensitive data is now stored as encrypted binary (see below).
+* Passwords are now hashed before storage.
 * Delete warnings now include the name of the item being deleted (for confirmation).
-
-## Data Encryption
-The following data is stored as encrypted binary. The key to decrypt the data is generated on the server using the user password but is stored locally to the user in a cookie (and not on the server). Equally the password is not stored on the server either (only an irreversable hash). 
-
-Barring a man-in-the-middle attack, only the end user will ever be able to see this data.
-
-* Account: Names
-* Account: Notes
-* Configuration: Annual Gross Salary
-* Configuration: Annual Tax Allowance
-* Configuration: Tax Rate
-* Configuration: Annual NI Allowance
-* Configuration: NI Rate
-* Configuration: Annual Non Pensionable Value
-* Configuration: Pension Contribution
-* Configuration: Weekly Spending Amount
-* Configuration: Starling API Key
-* Monthly Outgoing: Names
-* Monthly Outgoing: Values
-* Monthly Outgoing: Notes
-* Annual Expense: Names
-* Annual Expense: Values
-* Annual Expense: Notes
-* Savings: Names
-* Savings: Balance
-* Savings: Notes
 
 ## Installation
 This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/). I personally run this in a [Docker](https://www.docker.com/) container using [Gunicorn](https://gunicorn.org/). This is then served by [Caddy Web Server](https://caddyserver.com/).
 
-# Creating a user account
-bluesheet.py is a command line tool allowing you to add and unlock user accounts. Usage:
+The following environment variables need to be set for the app to run:
+
+* SESSION_KEY
+* PASSWORD_SALT
+
+Both should be strong passwords.
+
+# Admin CLI
+bluesheet.py is a command line tool allowing you to add users, unlock user accounts and change passwords.
+
+## Add a user
 ```shell
 python /path/to/bluesheet.py add-user -u joe.bloggs@example.com -p MyS3curePwd!
 ```
 
 When the user first logs in they will be taken to the configuration page.
 
-# Unlokcing a user account
+## Unlocking a user account
 If a user enters an incorrect password more than 3 times in a row their account will be locked, to unlock an account you can run the following:
 ```shell
 python /path/to/bluesheet.py unlock-user -u joe.bloggs@example.com
+```
+
+## Changing a users password
+To change a users password you can run the following:
+```shell
+python /path/to/bluesheet.py change-password -u joe.bloggs@example.com -p My0t4erS3curePwd!
 ```

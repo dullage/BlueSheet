@@ -1,6 +1,6 @@
 import click
 from main import db, User, PASSWORD_SALT
-from helpers import key
+from helpers import hash
 
 
 @click.group()
@@ -12,7 +12,7 @@ def cli():
 @click.option("--username", "-u")
 @click.option("--password", "-p")
 def add_user(username, password):
-    password = key(password, PASSWORD_SALT)
+    password = hash(password, PASSWORD_SALT)
 
     db.session.add(User(
         username=username,
@@ -35,8 +35,22 @@ def unlock_user(username):
     db.session.commit()
 
 
+@click.command()
+@click.option("--username", "-u")
+@click.option("--password", "-p")
+def change_password(username, password):
+    user = User.query.filter_by(
+        username=username
+    ).first()
+
+    user.password = hash(password, PASSWORD_SALT)
+
+    db.session.commit()
+
+
 cli.add_command(add_user)
 cli.add_command(unlock_user)
+cli.add_command(change_password)
 
 
 if __name__ == "__main__":

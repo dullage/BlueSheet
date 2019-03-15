@@ -1,6 +1,5 @@
 flask==1.0.2
 flask_sqlalchemy==2.3.2
-SQLAlchemy-Utils==0.33.11
 starlingbank==2.0
 python-dateutil==2.7.5
 click==7.0

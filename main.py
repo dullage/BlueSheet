@@ -2,23 +2,17 @@
 from flask import Flask, render_template, request, redirect, url_for, \
     session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_utils import EncryptedType
 import helpers as h
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
-from os import environ, urandom
+from os import environ
 from starlingbank import StarlingAccount
 from functools import wraps
 
-LOGIN_TIMEOUT_MINUTES = 30
-MAX_FAILED_LOGIN_ATTEMPTS = 3
-
-app = Flask(__name__)
-
-# If the environment variable SECRET_KEY is not set a new secret key will be
-# generated each time the app starts. Note: This invaldates any existing
-# session cookies.
-SESSION_KEY = environ.get("SESSION_KEY", urandom(16))
+SESSION_KEY = environ.get("SESSION_KEY")
+if SESSION_KEY is None:
+    print("Environment Variable SESSION_KEY not set!")
+    exit(1)
 
 
 PASSWORD_SALT = environ.get("PASSWORD_SALT")
@@ -26,16 +20,10 @@ if PASSWORD_SALT is None:
     print("Environment Variable PASSWORD_SALT not set!")
     exit(1)
 
+LOGIN_TIMEOUT_MINUTES = 30
+MAX_FAILED_LOGIN_ATTEMPTS = 3
 
-ENCRYPTION_KEY_SALT = environ.get("ENCRYPTION_KEY_SALT")
-if ENCRYPTION_KEY_SALT is None:
-    print("Environment Variable ENCRYPTION_KEY_SALT not set!")
-    exit(1)
-
-
-def get_key():
-    return session.get("key")
-
+app = Flask(__name__)
 
 app.secret_key = SESSION_KEY
 
@@ -122,7 +110,7 @@ class User(db.Model):
             return False, "Login failed, please try again."
         elif user.locked:
             return False, "Account locked, please contact your administrator."
-        elif h.key(password, PASSWORD_SALT) != user.password:
+        elif h.hash(password, PASSWORD_SALT) != user.password:
             user.failed_login_attempts += 1
             if user.failed_login_attempts >= MAX_FAILED_LOGIN_ATTEMPTS:
                 user.locked = True
@@ -139,7 +127,6 @@ class User(db.Model):
             session['last_activity'] = \
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             session['remember'] = h.checkbox_to_boolean(remember)
-            session["key"] = h.key(password, ENCRYPTION_KEY_SALT)
 
             user.process_savings()
 
@@ -237,15 +224,12 @@ class Configuration(db.Model):
         nullable=False
     )
     weekly_pay_day = db.Column(db.Integer, nullable=False)
-    weekly_spending_amount = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
+    weekly_spending_amount = db.Column(db.Numeric, nullable=False)
     annual_expense_outgoing_id = db.Column(
         db.Integer,
         db.ForeignKey('outgoing.id')
     )
-    starling_api_key = db.Column(EncryptedType(db.String, get_key))
+    starling_api_key = db.Column(db.String)
 
     def __init__(
         self,
@@ -272,34 +256,13 @@ class Salary(db.Model):
         unique=True,
         nullable=False
     )
-    annual_gross_salary = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    annual_tax_allowance = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    tax_rate = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    annual_ni_allowance = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    ni_rate = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    annual_non_pensionable_value = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
-    pension_contribution = db.Column(
-        EncryptedType(db.Numeric, get_key),
-        nullable=False
-    )
+    annual_gross_salary = db.Column(db.Numeric, nullable=False)
+    annual_tax_allowance = db.Column(db.Numeric, nullable=False)
+    tax_rate = db.Column(db.Numeric, nullable=False)
+    annual_ni_allowance = db.Column(db.Numeric, nullable=False)
+    ni_rate = db.Column(db.Numeric, nullable=False)
+    annual_non_pensionable_value = db.Column(db.Numeric, nullable=False)
+    pension_contribution = db.Column(db.Numeric, nullable=False)
 
     def __init__(
         self,
@@ -355,8 +318,8 @@ class Account(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(EncryptedType(db.String, get_key), nullable=False)
-    notes = db.Column(EncryptedType(db.String, get_key))
+    name = db.Column(db.String, nullable=False)
+    notes = db.Column(db.String)
     outgoings = db.relationship("Outgoing", backref="account", lazy=True)
 
     def __init__(self, user_id, name, notes=None):
@@ -384,8 +347,8 @@ class Outgoing(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(EncryptedType(db.String, get_key), nullable=False)
-    value = db.Column(EncryptedType(db.Numeric, get_key), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.Numeric, nullable=False)
     account_id = db.Column(
         db.Integer,
         db.ForeignKey('account.id'),
@@ -399,7 +362,7 @@ class Outgoing(db.Model):
     )
     is_self_loan = db.Column(db.Boolean, nullable=False)
     linked_saving_last_update = db.Column(db.Date)
-    notes = db.Column(EncryptedType(db.String, get_key))
+    notes = db.Column(db.String)
 
     def __init__(self, user_id, name, value, account_id, start_month=None,
                  end_month=None, linked_saving_id=None, is_self_loan=False,
@@ -601,9 +564,9 @@ class AnnualExpense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     month_paid = db.Column(db.Integer, nullable=False)
-    name = db.Column(EncryptedType(db.String, get_key), nullable=False)
-    value = db.Column(EncryptedType(db.Numeric, get_key), nullable=False)
-    notes = db.Column(EncryptedType(db.String, get_key))
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.Numeric, nullable=False)
+    notes = db.Column(db.String)
 
     def __init__(self, user_id, month_paid, name, value, notes=None):
         self.user_id = user_id
@@ -703,10 +666,10 @@ class Saving(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(EncryptedType(db.String, get_key), nullable=False)
-    balance = db.Column(EncryptedType(db.Numeric, get_key), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    balance = db.Column(db.Numeric, nullable=False)
     last_manual_update = db.Column(db.Date, nullable=False)
-    notes = db.Column(EncryptedType(db.String, get_key))
+    notes = db.Column(db.String)
     linked_outgoings = db.relationship(
         "Outgoing", backref="linked_saving", lazy=True
     )
