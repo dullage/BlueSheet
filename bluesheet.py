@@ -45,7 +45,7 @@ def change_password(username, password):
     ).first()
 
     user.password = hash(password, PASSWORD_SALT)
-    print(password)
+    print(user.password)
 
     db.session.commit()
 
