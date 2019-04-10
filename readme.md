@@ -13,7 +13,7 @@ It was designed with the following methodology in mind.
 2. On the last day of the month, enough money to cover all monthly outgoings is paid into the account from which they are taken.
 3. The remaining balance (expandable income) is saved and then withdrawn weekly (on the same day every week) throuhout the month.
 
-## Feaures
+## Features
 * Track monthly outgoings and ensure enough money is saved to cover them all.
 * Record and save for Annual Expenses - Link a monthly outgoing to your annual expenses so that the money is saved and ready when needed.
 * Record savings accounts and pensions to get a total of all savings.
