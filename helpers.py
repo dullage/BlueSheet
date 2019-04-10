@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 import math
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
 from base64 import urlsafe_b64encode
+from datetime import date, datetime
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from dateutil.relativedelta import relativedelta
 
 ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(math.floor(n/10)%10!=1)*(n%10<4)*n%10::4])  # noqa
 

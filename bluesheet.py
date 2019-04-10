@@ -1,6 +1,7 @@
 import click
-from main import db, User, PASSWORD_SALT
+
 from helpers import hash
+from main import PASSWORD_SALT, User, db
 
 
 @click.group()

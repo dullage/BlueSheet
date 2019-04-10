@@ -1,13 +1,16 @@
 #!/usr/bin/python3
-from flask import Flask, render_template, request, redirect, url_for, \
-    session, jsonify
-from flask_sqlalchemy import SQLAlchemy
-import helpers as h
-from datetime import datetime, date, timedelta
-from dateutil.relativedelta import relativedelta
-from os import environ
-from starlingbank import StarlingAccount
+
+from datetime import date, datetime, timedelta
 from functools import wraps
+from os import environ
+
+from dateutil.relativedelta import relativedelta
+from flask import (Flask, jsonify, redirect, render_template, request, session,
+                   url_for)
+from flask_sqlalchemy import SQLAlchemy
+from starlingbank import StarlingAccount
+
+import helpers as h
 
 SESSION_KEY = environ.get("SESSION_KEY")
 if SESSION_KEY is None:
