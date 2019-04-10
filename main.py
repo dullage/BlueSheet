@@ -30,8 +30,10 @@ app = Flask(__name__)
 
 app.secret_key = SESSION_KEY
 
-app.config["SQLALCHEMY_DATABASE_URI"] \
-    = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
+# app.config["SQLALCHEMY_DATABASE_URI"] \
+#     = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DATABASE_URL")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
