@@ -295,4 +295,4 @@ def hash(value, salt=""):
     return hased_value
 
 
-print(hash("password", "test"))
+# print(str(hash("password", "test")))
