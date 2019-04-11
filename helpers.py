@@ -292,7 +292,7 @@ def hash(value, salt=""):
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
     digest.update((value + salt).encode())
     hased_value = urlsafe_b64encode(digest.finalize())
-    return hased_value
+    return str(hased_value)
 
 
 # print(str(hash("password", "test")))

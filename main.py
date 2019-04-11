@@ -17,12 +17,10 @@ if SESSION_KEY is None:
     print("Environment Variable SESSION_KEY not set!")
     exit(1)
 
-
-PASSWORD_SALT = "test"
-# PASSWORD_SALT = environ.get("PASSWORD_SALT")
-# if PASSWORD_SALT is None:
-#     print("Environment Variable PASSWORD_SALT not set!")
-#     exit(1)
+PASSWORD_SALT = environ.get("PASSWORD_SALT")
+if PASSWORD_SALT is None:
+    print("Environment Variable PASSWORD_SALT not set!")
+    exit(1)
 
 LOGIN_TIMEOUT_MINUTES = 30
 MAX_FAILED_LOGIN_ATTEMPTS = 3
