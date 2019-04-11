@@ -34,7 +34,11 @@ It was designed with the following methodology in mind.
 * Delete warnings now include the name of the item being deleted (for confirmation).
 
 ## Installation
-This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/). I personally run this in a [Docker](https://www.docker.com/) container using [Gunicorn](https://gunicorn.org/). This is then served by [Caddy Web Server](https://caddyserver.com/).
+The easiest way to run your own version of BlueSheet is to click the button below to deploy it to Heroku. They offer free accounts which have some limitiations but should suffice for general use.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+Alternatively this is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/). I personally run this in a [Docker](https://www.docker.com/) container using [Gunicorn](https://gunicorn.org/). This is then served by [Caddy Web Server](https://caddyserver.com/).
 
 The following environment variables need to be set for the app to run:
 
