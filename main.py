@@ -69,7 +69,7 @@ class User(db.Model):
 
     def __init__(self, username, password):
         self.username = username.lower()
-        self.password = password
+        self.password = h.hash(password, salt=PASSWORD_SALT)
         self.failed_login_attempts = 0
         self.locked = False
 
@@ -694,6 +694,25 @@ class Saving(db.Model):
 
 
 db.create_all()
+
+
+def create_env_user():
+    # if User.query.count() > 0:
+    #     return
+
+    username = environ.get("USERNAME")
+    if username is None:
+        return
+
+    password = environ.get("PASSWORD")
+    if password is None:
+        return
+
+    db.session.add(User(username, password))
+    db.session.commit()
+
+
+create_env_user()
 # endregion
 
 

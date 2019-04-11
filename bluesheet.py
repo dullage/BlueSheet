@@ -13,12 +13,7 @@ def cli():
 @click.option("--username", "-u")
 @click.option("--password", "-p")
 def add_user(username, password):
-    password = hash(password, PASSWORD_SALT)
-
-    db.session.add(User(
-        username=username,
-        password=password
-    ))
+    db.session.add(User(username=username, password=password))
 
     db.session.commit()
 
@@ -26,9 +21,7 @@ def add_user(username, password):
 @click.command()
 @click.option("--username", "-u")
 def unlock_user(username):
-    user = User.query.filter_by(
-        username=username
-    ).first()
+    user = User.query.filter_by(username=username).first()
 
     user.locked = False
     user.failed_login_attempts = 0
@@ -40,11 +33,9 @@ def unlock_user(username):
 @click.option("--username", "-u")
 @click.option("--password", "-p")
 def change_password(username, password):
-    user = User.query.filter_by(
-        username=username
-    ).first()
+    user = User.query.filter_by(username=username).first()
 
-    user.password = hash(password, PASSWORD_SALT)
+    user.password = hash(password, salt=PASSWORD_SALT)
     print(user.password)
 
     db.session.commit()
