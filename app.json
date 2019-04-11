@@ -1,0 +1,23 @@
+{
+    "name": "BlueSheet",
+    "description": "A web app to help manage personal finances.",
+    "repository": "https://github.com/Dullage/BlueSheet/tree/development",
+    "logo": "https://raw.githubusercontent.com/Dullage/BlueSheet/development/static/BlueSheet.png",
+    "addons": {
+        "postgresql": {
+            "plan": "hobby-dev"
+        }
+    },
+    "env": {
+        "SESSION_KEY": {
+            "description": "Secret key used to encrypt session cookie.",
+            "required": true,
+            "generator": "secret"
+        },
+        "PASSWORD_SALT": {
+            "description": "Secret key used to hash user passwords.",
+            "required": true,
+            "generator": "secret"
+        }
+    }
+  }
