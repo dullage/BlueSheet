@@ -68,7 +68,7 @@ class User(db.Model):
     )
 
     def __init__(self, username, password):
-        self.username = username
+        self.username = username.lower()
         self.password = password
         self.failed_login_attempts = 0
         self.locked = False
@@ -92,7 +92,7 @@ class User(db.Model):
 
     @classmethod
     def login(cls, username, password, remember, session):
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username.lower()).first()
 
         if user is None:
             return False, "Login failed, please try again."
