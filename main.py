@@ -33,16 +33,11 @@ LOGIN_TIMEOUT_MINUTES = 30
 MAX_FAILED_LOGIN_ATTEMPTS = 3
 
 app = Flask(__name__)
-
 app.secret_key = SESSION_KEY
-
-# app.config["SQLALCHEMY_DATABASE_URI"] \
-#     = f"sqlite:///{environ.get('DATABASE_PATH', 'BlueSheet.db')}"
-
-app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("DATABASE_URL")
-
+app.config["SQLALCHEMY_DATABASE_URI"] = environ.get(
+    "DATABASE_URL", "sqlite:///database.db"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 db = SQLAlchemy(app)
 
 # Define "permanent" as 1 year and not the default 31 days
