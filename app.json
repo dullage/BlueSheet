@@ -5,7 +5,7 @@
     "logo": "https://raw.githubusercontent.com/Dullage/BlueSheet/development/static/BlueSheet.png",
     "addons": ["heroku-postgresql:hobby-dev"],
     "env": {
-        "USERNAME" {
+        "USERNAME": {
             "description": "Please enter a username for BlueSheet access.",
             "required": true
         },
