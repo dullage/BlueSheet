@@ -132,8 +132,8 @@ def spending_money_savings_target_balance(
 
     if debug:
         print(
-            f"Calculation Month Pay Day Count: {calculation_month_pay_day_count}"
-        )  # noqa
+            f"Calculation Month Pay Day Count: {calculation_month_pay_day_count}"   # noqa
+        )
 
     # How many times has a monthly saving been paid in since the last reset?
     payments_in = 0

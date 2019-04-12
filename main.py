@@ -5,15 +5,8 @@ from functools import wraps
 from os import environ
 
 from dateutil.relativedelta import relativedelta
-from flask import (
-    Flask,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import (Flask, jsonify, redirect, render_template, request, session,
+                   url_for)
 from flask_sqlalchemy import SQLAlchemy
 from starlingbank import StarlingAccount
 
@@ -69,7 +62,7 @@ class User(db.Model):
 
     def __init__(self, username, password):
         self.username = username.lower()
-        self.password = h.hash(password, salt=PASSWORD_SALT)
+        self.password = password
         self.failed_login_attempts = 0
         self.locked = False
 
@@ -694,12 +687,10 @@ class Saving(db.Model):
 
 
 db.create_all()
+db.session.commit()
 
 
-def create_env_user():
-    # if User.query.count() > 0:
-    #     return
-
+def env_user():
     username = environ.get("USERNAME")
     if username is None:
         return
@@ -708,11 +699,16 @@ def create_env_user():
     if password is None:
         return
 
-    db.session.add(User(username, password))
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user is None:
+        db.session.add(User(username, password))
+    else:
+        existing_user.password = h.hash(password, PASSWORD_SALT)
+
     db.session.commit()
 
 
-create_env_user()
+env_user()
 # endregion
 
 
