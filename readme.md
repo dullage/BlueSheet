@@ -5,13 +5,13 @@ A web app to help manage personal finances.
 ![Outgoings - Mobile](docs/outgoings-mobile.png)
 
 ## Introduction
-I was looking for a project to improve my (non-existent) HTML and CSS knowledge and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances. It also gave me an opportunity to expolore SQL Alchemy and Jinja templating.
+I was looking for a project to improve my (non-existent) HTML and CSS knowledge and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances. It also gave me an opportunity to explore SQL Alchemy and Jinja templating.
 
 It was designed with the following methodology in mind.
 
 1. Salary is paid monthly and not used until the end of the month.
 2. On the last day of the month, enough money to cover all monthly outgoings is paid into the account from which they are taken.
-3. The remaining balance (expandable income) is saved and then withdrawn weekly (on the same day every week) throuhout the month.
+3. The remaining balance (expandable income) is saved and then withdrawn weekly (on the same day every week) throughout the month.
 
 ## Features
 * Track monthly outgoings and ensure enough money is saved to cover them all.
@@ -20,7 +20,7 @@ It was designed with the following methodology in mind.
 * Link an outgoing to a saving to increase the savings account balance by that amount each month.
 * Create "self loans" allowing you to borrow from savings and create a re-payment plan.
 * Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
-* Starling Bank Integration - See your main acocunt and savings goal balances on the dashboard.
+* Starling Bank Integration - See your main account and savings goal balances on the dashboard.
 * Multiple User Support - Multiple users can each have their own password protected set of data.
 * Mobile Responsive.
 
@@ -33,8 +33,12 @@ It was designed with the following methodology in mind.
 * Passwords are now hashed before storage.
 * Delete warnings now include the name of the item being deleted (for confirmation).
 
+12/04/2019
+* Added files required to easily deploy to Heroku.
+* Added ability to create a user or change a users password using environment variables (useful for easy Heroku deployment).
+
 ## Installation
-The easiest way to run your own version of BlueSheet is to click the button below to deploy it to Heroku. They offer free accounts which have some limitiations but should suffice for general use.
+The easiest way to run your own version of BlueSheet is to click the button below to deploy it to [Heroku](https://www.heroku.com/). They offer free accounts which have [some limitations](https://www.heroku.com/pricing) but should easily suffice for general use.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
@@ -45,10 +49,12 @@ The following environment variables need to be set for the app to run:
 * SESSION_KEY
 * PASSWORD_SALT
 
-Both should be strong passwords.
+Both should be strong passwords. *Note: These will be automatically generated if deploying to Heroku.*
 
 # Admin CLI
 bluesheet.py is a command line tool allowing you to add users, unlock user accounts and change passwords.
+
+Alternatively you can also set USERNAME and PASSWORD environment variables. When the app is fist launched, if the declared user already exists the users password will be updated, if not a new user will be created.
 
 ## Add a user
 ```shell
