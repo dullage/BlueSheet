@@ -35,7 +35,7 @@
       <form action="{{ url_for('login_handler') }}" method="post">
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required><br>
-        <input type="checkbox" name="remember"><span id="remember-me">Remember Me</span>
+        <input type="checkbox" name="remember" id="remember"><label id="remember-me" for="remember">Remember Me</label>
         <button type="submit" id="login-submit-button">
           <span class="mdi mdi-login-variant" id="login-submit-button">Login</span>
         </button>

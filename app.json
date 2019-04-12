@@ -1,0 +1,27 @@
+{
+    "name": "BlueSheet",
+    "description": "A web app to help manage personal finances.",
+    "repository": "https://github.com/Dullage/BlueSheet",
+    "logo": "https://raw.githubusercontent.com/Dullage/BlueSheet/static/BlueSheet.png",
+    "addons": ["heroku-postgresql:hobby-dev"],
+    "env": {
+        "USERNAME": {
+            "description": "Please enter a username for BlueSheet access.",
+            "required": true
+        },
+        "PASSWORD": {
+            "description": "Please enter a password for BlueSheet access.",
+            "required": true
+        },
+        "SESSION_KEY": {
+            "description": "Secret key used to encrypt session cookie. This will be automatically generated.",
+            "required": true,
+            "generator": "secret"
+        },
+        "PASSWORD_SALT": {
+            "description": "Secret key used to hash user passwords. This will be automatically generated.",
+            "required": true,
+            "generator": "secret"
+        }
+    }
+}
