@@ -699,7 +699,7 @@ def env_user():
     if password is None:
         return
 
-    existing_user = User.query.filter_by(username=username).first()
+    existing_user = User.query.filter_by(username=username.lower()).first()
     if existing_user is None:
         db.session.add(User(username, password))
     else:
