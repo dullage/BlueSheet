@@ -2,7 +2,7 @@
     "name": "BlueSheet",
     "description": "A web app to help manage personal finances.",
     "repository": "https://github.com/Dullage/BlueSheet",
-    "logo": "https://raw.githubusercontent.com/Dullage/BlueSheet/static/BlueSheet.png",
+    "logo": "https://raw.githubusercontent.com/Dullage/BlueSheet/master/static/BlueSheet.png",
     "addons": ["heroku-postgresql:hobby-dev"],
     "env": {
         "USERNAME": {
