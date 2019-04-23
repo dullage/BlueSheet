@@ -3,7 +3,6 @@ flask_sqlalchemy==2.3.2
 starlingbank==2.0
 python-dateutil==2.7.5
 click==7.0
-cryptography==2.6.1
 
 gunicorn==19.9.0
 psycopg2==2.8.1

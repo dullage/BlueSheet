@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 
 import math
-from base64 import urlsafe_b64encode
 from datetime import date, datetime
+from hashlib import sha256
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
 from dateutil.relativedelta import relativedelta
 
 ordinal = lambda n: "%d%s" % (
@@ -132,7 +130,7 @@ def spending_money_savings_target_balance(
 
     if debug:
         print(
-            f"Calculation Month Pay Day Count: {calculation_month_pay_day_count}"   # noqa
+            f"Calculation Month Pay Day Count: {calculation_month_pay_day_count}"  # noqa
         )
 
     # How many times has a monthly saving been paid in since the last reset?
@@ -278,7 +276,5 @@ def checkbox_to_boolean(value):
 
 
 def hash(value, salt=""):
-    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-    digest.update((value + salt).encode())
-    hased_value = urlsafe_b64encode(digest.finalize())
-    return str(hased_value)
+    hashed_value = sha256((value + salt).encode()).hexdigest()
+    return hashed_value

@@ -37,6 +37,9 @@ It was designed with the following methodology in mind.
 * Added files required to easily deploy to Heroku.
 * Added ability to create a user or change a users password using environment variables (useful for easy Heroku deployment).
 
+23/04/2019
+* Removed cryptography dependency. If updating from before this date a password change may be required.
+
 ## Installation
 ### Heroku Deployment
 The easiest way to run your own version of BlueSheet is to click the button below to deploy it to [Heroku](https://www.heroku.com/). They offer free accounts which have [some limitations](https://www.heroku.com/pricing) but should easily suffice for general use.
