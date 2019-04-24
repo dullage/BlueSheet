@@ -70,6 +70,10 @@ The following environment variables need to be set for the app to run:
 
 Both should be strong passwords. *Note: These will be automatically generated if deploying to Heroku.*
 
+You can also optionally set a **DATABASE_URL** environment variable which can be any [SQL Alchemy connection string](https://docs.sqlalchemy.org/en/13/core/engines.html). This will default to `sqlite:///database.db` (a SQLite database stored in a location relative to where the applicant is run) if not specified. 
+
+*Note: The Heroku deployment will automatically setup a PostgreSQL database and fill in the DATABASE_URL accordingly.*
+
 # Admin CLI
 bluesheet.py is a command line tool allowing you to add users, unlock user accounts and change passwords.
 
