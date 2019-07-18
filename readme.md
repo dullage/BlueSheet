@@ -25,20 +25,23 @@ It was designed with the following methodology in mind.
 * Mobile Responsive.
 
 ## Change Log
-24/02/2019
-* Fixed session expiry.
+18/07/2019
+* The "Future Spending Money Savings" total now includes next months savings on the last day of the month. This helps when doing the banking on the last day.
+
+23/04/2019
+* Removed cryptography dependency. If updating from before this date a password change may be required.
+
+12/04/2019
+* Added files required to easily deploy to Heroku.
+* Added ability to create a user or change a users password using environment variables (useful for easy Heroku deployment).
 
 14/03/2019
 * Fixed an issue loading existing Weekly Pay Day config.
 * Passwords are now hashed before storage.
 * Delete warnings now include the name of the item being deleted (for confirmation).
 
-12/04/2019
-* Added files required to easily deploy to Heroku.
-* Added ability to create a user or change a users password using environment variables (useful for easy Heroku deployment).
-
-23/04/2019
-* Removed cryptography dependency. If updating from before this date a password change may be required.
+24/02/2019
+* Fixed session expiry.
 
 ## Installation
 ### Heroku Deployment
