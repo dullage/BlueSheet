@@ -5,8 +5,8 @@ from functools import wraps
 from os import environ
 
 from dateutil.relativedelta import relativedelta
-from flask import (Flask, jsonify, redirect, render_template, request, session,
-                   url_for)
+from flask import (
+    Flask, jsonify, redirect, render_template, request, session, url_for)
 from flask_sqlalchemy import SQLAlchemy
 from starlingbank import StarlingAccount
 
@@ -182,10 +182,28 @@ class User(db.Model):
 
     @property
     def weekly_spending_calculations(self):
-        return h.spending_money_savings_target_balance(
-            self.configuration.weekly_pay_day,
-            self.configuration.weekly_spending_amount,
-        )
+        tomorrow = date.today() + relativedelta(days=1)
+
+        # If tommorow is the 1st, calculate as if it were tommorow as the
+        # banking is done today, then add back in the weekly spending amount
+        # that will be paid tomorrow.
+        if tomorrow.day == 1:
+            target = (
+                h.spending_money_savings_target_balance(
+                    self.configuration.weekly_pay_day,
+                    self.configuration.weekly_spending_amount,
+                    tomorrow,
+                )
+                + self.weekly_spending_amount
+            )
+        # Else just calculate for today
+        else:
+            target = h.spending_money_savings_target_balance(
+                self.configuration.weekly_pay_day,
+                self.configuration.weekly_spending_amount,
+            )
+
+        return target
 
     @property
     def starling_account(self):
