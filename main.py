@@ -188,14 +188,13 @@ class User(db.Model):
         # banking is done today, then add back in the weekly spending amount
         # that will be paid tomorrow.
         if tomorrow.day == 1:
-            target = (
-                h.spending_money_savings_target_balance(
-                    self.configuration.weekly_pay_day,
-                    self.configuration.weekly_spending_amount,
-                    tomorrow,
-                )
-                + self.weekly_spending_amount
+            target = h.spending_money_savings_target_balance(
+                self.configuration.weekly_pay_day,
+                self.configuration.weekly_spending_amount,
+                tomorrow,
             )
+            if tomorrow.weekday() == self.configuration.weekly_pay_day:
+                target = target + self.configuration.weekly_spending_amount
         # Else just calculate for today
         else:
             target = h.spending_money_savings_target_balance(
