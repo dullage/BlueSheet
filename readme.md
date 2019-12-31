@@ -25,6 +25,9 @@ It was designed with the following methodology in mind.
 * Mobile Responsive.
 
 ## Change Log
+31/12/2019
+* Bumped starlingbank version.
+
 18/07/2019
 * The "Future Spending Money Savings" total now includes next months savings on the last day of the month. This helps when doing the banking on the last day.
 
