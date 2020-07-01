@@ -3,6 +3,6 @@ flask_sqlalchemy==2.3.2
 starlingbank==3.2
 python-dateutil==2.7.5
 click==7.0
-psycopg2==2.8.4
 
 gunicorn==19.9.0
+psycopg2==2.8.4
