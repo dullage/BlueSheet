@@ -25,6 +25,11 @@ It was designed with the following methodology in mind.
 * Mobile Responsive.
 
 ## Change Log
+15/04/2021
+* Removed Herouku deployment option.
+* Added Dockerfile.
+* Replaced requirements.txt for Pipfile.
+
 31/12/2019
 * Bumped starlingbank version.
 
@@ -47,38 +52,16 @@ It was designed with the following methodology in mind.
 * Fixed session expiry.
 
 ## Installation
-### Heroku Deployment
-The easiest way to run your own version of BlueSheet is to click the button below to deploy it to [Heroku](https://www.heroku.com/). They offer free accounts which have [some limitations](https://www.heroku.com/pricing) but should easily suffice for general use.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-Once deployed, to update to the latest verion you can do the following:
-
-1. Download and install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) if you don't have it already.
-2. Download and install the [Heroku CLI Tool](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) if you don't have it already.
-3. Open a terminal / command prompt.
-4. Login to Heroku using: `heroku login`
-5. Clone your existing deployments source code: `heroku git:clone -a <your app name>` (where "\<your app name>" is what you called BlueSheet on Heroku). *Note: You may get a message to say that you have cloned an empty repository, this is ok.*
-6. This will have created a directory with the same name as your app. Nagivate to that directory: `cd <your app name>`
-7. Link this repository: `git remote add source https://github.com/Dullage/BlueSheet`
-8. Download the latest source code from the linked repo: `git pull source master`
-9. Push the latest source code to your app: `git push heroku master`
-10. You can now delete the directory that was created if required.
-
-
-### Other Deployment Options
-Alternatively this is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/). I personally run this in a [Docker](https://www.docker.com/) container using [Gunicorn](https://gunicorn.org/). This is then served by [Caddy Web Server](https://caddyserver.com/).
+This is a flask python app so can be deployed in [a number of different ways](http://flask.pocoo.org/docs/1.0/deploying/).
 
 The following environment variables need to be set for the app to run:
 
 * SESSION_KEY
 * PASSWORD_SALT
 
-Both should be strong passwords. *Note: These will be automatically generated if deploying to Heroku.*
+Both should be strong passwords.
 
 You can also optionally set a **DATABASE_URL** environment variable which can be any [SQL Alchemy connection string](https://docs.sqlalchemy.org/en/13/core/engines.html). This will default to `sqlite:///database.db` (a SQLite database stored in a location relative to where the applicant is run) if not specified. 
-
-*Note: The Heroku deployment will automatically setup a PostgreSQL database and fill in the DATABASE_URL accordingly.*
 
 # Admin CLI
 bluesheet.py is a command line tool allowing you to add users, unlock user accounts and change passwords.
