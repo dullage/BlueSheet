@@ -44,22 +44,25 @@
     </table>
     <br>
     <h2>Future Spending Money Savings</h2>
-    <p>To cover future spending money savings should currently total:</p>
+    <p>To cover future spending money, savings should currently total:</p>
     <span class="bold">£{{ "{:,.2f}".format(user.weekly_spending_calculations) }}</span>
   </div>
 
   <div class="grid-item">
     <h1>Annual Expenses</h1>
     <hr id="annual-expenses-grid-item">
-    <p>This months annual expenses.</p>
+    {% set annual_expenses = current_month_annual_expenses.all() %}
+    {% if annual_expenses | length > 0 %}
+      <p>This months annual expenses.</p>
+    {% endif %}
     <table>
       <tbody>
-        {% for annual_expense in current_month_annual_expenses %}
+        {% for annual_expense in annual_expenses %}
           <tr title="{{ annual_expense.notes if annual_expense.notes }}">
             <td class="stretch">{{ annual_expense.name }}</td>
             <td>£ {{ '{:,.2f}'.format(annual_expense.value) }}</td>
           </tr>
-        {% endfor %}
+        {% endfor %}        
         <tr>
           <td class="bold stretch">End of Month Target Balance</td>
           <td class="bold">£ {{ '{:,.2f}'.format(end_of_month_target_balance) }}</td>

@@ -6,11 +6,6 @@ from hashlib import sha256
 
 from dateutil.relativedelta import relativedelta
 
-ordinal = lambda n: "%d%s" % (
-    n,
-    "tsnrhtdd"[(math.floor(n / 10) % 10 != 1) * (n % 10 < 4) * n % 10 :: 4],
-)  # noqa
-
 
 def empty_strings_to_none(dictionary):
     new_dictionary = {}

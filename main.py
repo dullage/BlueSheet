@@ -7,7 +7,6 @@ from os import environ
 from dateutil.relativedelta import relativedelta
 from flask import (
     Flask,
-    jsonify,
     redirect,
     render_template,
     request,
@@ -72,7 +71,7 @@ class User(db.Model):
 
     @classmethod
     def login(cls, username, password, remember, session):
-        user = User.query.filter_by(username=username.lower()).first()
+        user = cls.query.filter_by(username=username.lower()).first()
 
         if user is None:
             return False, "Login failed, please try again."
@@ -135,10 +134,7 @@ class User(db.Model):
         """Checks to see if the user has completed configuration and returns
         True if not. This assumes that if configuration exists it is complete.
         """
-        if self.configuration is None:
-            return True
-        else:
-            return False
+        return self.configuration is None
 
     def total_outgoings(self, month_offset=0):
         """The total value of all of the users monthly outgoings."""
@@ -442,12 +438,15 @@ class Outgoing(db.Model):
 
         if self.start_month is not None and self.end_month is not None:
             # Start and End Months
-            return f"\
-{start} {self.start_month_friendly}\n\
-{end} {self.end_month_friendly}\n\
-\n\
-{self.months_paid} payment(s) overall totaling £{self.payments_total:,.2f}\n\
-{self.months_paid_left} payment(s) left totaling £{self.payments_left_total:,.2f}"  # noqa
+            return "\n".join(
+                [
+                    f"{start} {self.start_month_friendly}",
+                    f"{end} {self.end_month_friendly}",
+                    "",
+                    f"{self.months_paid} payment(s) overall totaling £{self.payments_total:,.2f}",
+                    f"{self.months_paid_left} payment(s) left totaling £{self.payments_left_total:,.2f}",
+                ]
+            )
         elif self.start_month is not None:
             # Start Month Only
             return f"{start} {self.start_month_friendly}"
@@ -486,8 +485,8 @@ class AnnualExpense(db.Model):
 
     @classmethod
     def by_month_range(cls, user, start_month_num, end_month_num):
-        """Returns a list of AnnualExpense objects
-        given a User id and a target month."""
+        """Returns a list of AnnualExpense objects given a User id and a
+        target month."""
         return cls.query.filter(
             cls.user_id == user.id,
             cls.month_paid >= start_month_num,
