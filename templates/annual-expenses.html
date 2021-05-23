@@ -13,7 +13,6 @@
         {% for annual_expense in user.annual_expenses %}
           {% if annual_expense.month_paid == month_num %}
           <tr>
-            <td class="hide-on-mobile">{{ annual_expense.id }}</td>
             <td>{{ month_name }}</td>
             <td>{{ annual_expense.name }}</td>
             <td>£{{ "{:,.2f}".format(annual_expense.value) }}</td>

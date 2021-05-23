@@ -23,6 +23,7 @@ It was designed with the following methodology in mind.
 ## Change Log
 23/05/2021
 * Removed Starling Bank integration and Savings functionality. I'd like to completely overhaul this project at some point and so removing the functionality I don't use is a start.
+* Removed ids from UI.
 
 15/04/2021
 * Removed Herouku deployment option.
