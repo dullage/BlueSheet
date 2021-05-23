@@ -10,7 +10,6 @@ rope = "*"
 flake8 = "*"
 
 [packages]
-starlingbank = "*"
 python-dateutil = "*"
 click = "*"
 Flask = "*"

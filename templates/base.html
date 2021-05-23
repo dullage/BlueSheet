@@ -46,9 +46,6 @@
       <li><a href="{{ url_for('annual_expenses') }}" {% if page == 'annual-expenses' %}class="current-page"{% endif %}>
         <span class="mdi mdi-calendar-multiselect color-inherit"></span>Annual Expenses
       </a></li>
-      <li><a href="{{ url_for('savings') }}" {% if page == 'savings' %}class="current-page"{% endif %}>
-        <span class="mdi mdi-coins color-inherit"></span>Savings & Pension
-      </a></li>
 
       <li><a href="{{ url_for('configuration', return_page=page) }}" {% if page == 'configuration' %}class="current-page"{% endif %}>
           <span class="mdi mdi-settings color-inherit"></span>Configuration

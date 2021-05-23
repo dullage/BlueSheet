@@ -5,7 +5,7 @@ A web app to help manage personal finances.
 ![Outgoings - Mobile](docs/outgoings-mobile.png)
 
 ## Introduction
-I was looking for a project to improve my (non-existent) HTML and CSS knowledge and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances. It also gave me an opportunity to explore SQL Alchemy and Jinja templating.
+I was looking for a project to improve my (at the time, non-existent) HTML and CSS knowledge and so I built this web app to replace a number of spreadsheets I was using to track my own personal finances. It also gave me an opportunity to explore SQL Alchemy and Jinja templating.
 
 It was designed with the following methodology in mind.
 
@@ -16,15 +16,14 @@ It was designed with the following methodology in mind.
 ## Features
 * Track monthly outgoings and ensure enough money is saved to cover them all.
 * Record and save for Annual Expenses - Link a monthly outgoing to your annual expenses so that the money is saved and ready when needed.
-* Record savings accounts and pensions to get a total of all savings.
-* Link an outgoing to a saving to increase the savings account balance by that amount each month.
-* Create "self loans" allowing you to borrow from savings and create a re-payment plan.
 * Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
-* Starling Bank Integration - See your main account and savings goal balances on the dashboard.
 * Multiple User Support - Multiple users can each have their own password protected set of data.
 * Mobile Responsive.
 
 ## Change Log
+23/05/2021
+* Removed Starling Bank integration and Savings functionality. I'd like to completely overhaul this project at some point and so removing the functionality I don't use is a start.
+
 15/04/2021
 * Removed Herouku deployment option.
 * Added Dockerfile.

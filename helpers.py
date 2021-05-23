@@ -27,29 +27,6 @@ def current_month_num():
     return int(datetime.now().strftime("%m"))
 
 
-class DemoStarlingAccount:
-    def __init__(self, effective_balance):
-        self.effective_balance = effective_balance
-        self.savings_goals = {}
-
-
-class DemoSavingsGoal:
-    def __init__(self, name, total_saved_minor_units):
-        self.name = name
-        self.total_saved_minor_units = total_saved_minor_units
-
-
-demo_starling_account = DemoStarlingAccount(effective_balance=78.63)
-demo_starling_account.savings_goals["1"] = DemoSavingsGoal(
-    name="Holiday", total_saved_minor_units=10345
-)
-demo_starling_account.savings_goals["2"] = DemoSavingsGoal(
-    name="Wedding", total_saved_minor_units=2344
-)
-demo_starling_account.savings_goals["3"] = DemoSavingsGoal(
-    name="Christmas", total_saved_minor_units=9876
-)
-
 months = {
     1: "January",
     2: "February",

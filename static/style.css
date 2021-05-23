@@ -1,413 +1,403 @@
 * {
-    font-family: 'Lato', sans-serif;
-    color: #31507a;
-    margin: 0;
-    padding: 0; 
-    box-sizing: border-box;
+  font-family: "Lato", sans-serif;
+  color: #31507a;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .login-outer {
-    background-color: #425979;
-    background-blend-mode: lighten;
-    display: table;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: -1;
+  background-color: #425979;
+  background-blend-mode: lighten;
+  display: table;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
 }
 
 .login-middle {
-    display: table-cell;
-    vertical-align: middle;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 .login-inner {
-    margin-left: auto;
-    margin-right: auto;
-    width: 300px;
-    color: white;
-    text-align: center;
-  }
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+  color: white;
+  text-align: center;
+}
 
 .login-outer img {
-    position: fixed;
-    width: 100%;
-    min-height: 100%;
-    height: auto;
-    left: 0;
-    top: 0;
-    opacity: 0.1;
-    z-index: -1;
+  position: fixed;
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  left: 0;
+  top: 0;
+  opacity: 0.1;
+  z-index: -1;
 }
 @media screen and (max-aspect-ratio: 8/10) {
-    .login-outer img {
-        width: 300%;
-    }
+  .login-outer img {
+    width: 300%;
+  }
 }
 
 .login-logo-name {
-    font-size: 60px;
-    font-weight: bold;
-    color: white;
-    margin: 0;
+  font-size: 60px;
+  font-weight: bold;
+  color: white;
+  margin: 0;
 }
 
 .login-logo {
-    font-size: 100px;
-    color: white;
+  font-size: 100px;
+  color: white;
 }
 
-.login-inner input[type=text],
-.login-inner input[type=password] {
-    width: 240px;
-    padding: 6px;
-    margin: 2px;
-    background-color: transparent;
-    color: white;
-    border: 0;
-    border-bottom: 2px solid white;
-    outline: none;
+.login-inner input[type="text"],
+.login-inner input[type="password"] {
+  width: 240px;
+  padding: 6px;
+  margin: 2px;
+  background-color: transparent;
+  color: white;
+  border: 0;
+  border-bottom: 2px solid white;
+  outline: none;
 }
-.login-inner input[type=text]::placeholder,
-.login-inner input[type=password]::placeholder {
-    color: white;
+.login-inner input[type="text"]::placeholder,
+.login-inner input[type="password"]::placeholder {
+  color: white;
 }
 
-.login-inner input[type=checkbox] {
-    vertical-align: -1px;
+.login-inner input[type="checkbox"] {
+  vertical-align: -1px;
 }
 .login-inner #remember-me {
-    color: white;
-    vertical-align: 1px;
-    font-size: 15px;
-    margin-right: 20px;
+  color: white;
+  vertical-align: 1px;
+  font-size: 15px;
+  margin-right: 20px;
 }
 
 .login-message {
-    color: white;
+  color: white;
 }
 
 .logo {
-    display: block;
-    color: gainsboro;
-    padding: 16px 16px 16px 16px;
-    font-weight: bold;
-    font-size: 38px;
-    color: white;
-    text-align: center;
+  display: block;
+  color: gainsboro;
+  padding: 16px 16px 16px 16px;
+  font-weight: bold;
+  font-size: 38px;
+  color: white;
+  text-align: center;
 }
 
 body {
-    background-color: white;
+  background-color: white;
 }
 
 .main {
-    margin: 0 0 0 250px;
+  margin: 0 0 0 250px;
 }
 @media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
-    .main {
-        margin: 0px 0 0 0;
-    }
+  .main {
+    margin: 0px 0 0 0;
+  }
 }
 
 .card {
-    background-color: white;
-    margin: 40px auto;
-    padding: 30px;
-    box-shadow: 0px 6px 40px 0px #e2e2e2;
-    border: 1px dashed #f2f7ff;
-    width: 90%;
+  background-color: white;
+  margin: 40px auto;
+  padding: 30px;
+  box-shadow: 0px 6px 40px 0px #e2e2e2;
+  border: 1px dashed #f2f7ff;
+  width: 90%;
 }
 @media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
-    .card {
-        width: 100%;
-        box-shadow: none;
-        border: none;
-        margin: 0 0 40px 0;
-        padding: 10px;
-    }
+  .card {
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    margin: 0 0 40px 0;
+    padding: 10px;
+  }
 }
 
 .grid {
-    background: white;
-    margin: 0 auto;
-  }
+  background: white;
+  margin: 0 auto;
+}
 .grid:after {
-    content: '';
-    display: block;
-    clear: both;
+  content: "";
+  display: block;
+  clear: both;
 }
 .grid-item {
-    width: 500px;
-    background-color: white;
-    margin: 40px;
-    padding: 30px;
-    box-shadow: 0px 6px 40px 0px #e2e2e2;
-    border: 1px dashed #f2f7ff;
+  width: 500px;
+  background-color: white;
+  margin: 40px;
+  padding: 30px;
+  box-shadow: 0px 6px 40px 0px #e2e2e2;
+  border: 1px dashed #f2f7ff;
 }
 @media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
-    .grid-item {
-        width: 100%;
-        margin: 0 0 40px 0;
-        padding: 10px;
-        box-shadow: none;
-        border: none;
-    }
+  .grid-item {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 10px;
+    box-shadow: none;
+    border: none;
+  }
 }
 .grid-item hr {
-    width: 33%;
-    height: 3px;
-    border: none;
-    background-color: #31507a;
-    margin: 0 0 8px 0;
+  width: 33%;
+  height: 3px;
+  border: none;
+  background-color: #31507a;
+  margin: 0 0 8px 0;
 }
 #outgoings-grid-item {
-    background-color: #DE7A22;
+  background-color: #de7a22;
 }
 #monthly-salary-grid-item {
-    background-color: #346753;
+  background-color: #346753;
 }
 #weekly-spending-money-outgoings-grid-item {
-    background-color: rgb(123,197,246);
-}
-#starling-account-grid-item {
-    background-color: rgb(46,72,126);
+  background-color: rgb(123, 197, 246);
 }
 #annual-expenses-grid-item {
-    background-color: rgb(71, 126, 46);
+  background-color: rgb(71, 126, 46);
 }
-#savings-grid-item {
-    background-color: rgb(224, 60, 60);
-}
-  
-/* .grid-item--width2 { width: 320px; }
-.grid-item--width3 { width: 480px; }
-.grid-item--width4 { width: 640px; }
-
-.grid-item--height2 { height: 200px; }
-.grid-item--height3 { height: 260px; }
-.grid-item--height4 { height: 360px; } */
 
 .input {
-    display: table;
-    width: 400px;
+  display: table;
+  width: 400px;
 }
 @media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
-    .input {
-        width: 100%;
-    }
+  .input {
+    width: 100%;
+  }
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 a:hover {
-    color: #31507a;
+  color: #31507a;
 }
 
-button, .button {
-    background: white;
-    border: 1px solid whitesmoke;
-    border-radius: 3px; 
-    color: #31507a;    
-    font-size: 16px;
-    padding: 6px 8px;
-    margin: 6px 0px;
-    box-shadow: 0px 2px 4px 0px rgb(223, 223, 223);
+button,
+.button {
+  background: white;
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  color: #31507a;
+  font-size: 16px;
+  padding: 6px 8px;
+  margin: 6px 0px;
+  box-shadow: 0px 2px 4px 0px rgb(223, 223, 223);
 }
 
-button:hover, .button:hover{
-    box-shadow: 0px 2px 4px 0px rgb(199, 199, 199);
+button:hover,
+.button:hover {
+  box-shadow: 0px 2px 4px 0px rgb(199, 199, 199);
 }
 
 #login-submit-button {
-    background-color: transparent;
-    border: none;
-    color: white;
-    box-shadow: none;
-    outline: none;
+  background-color: transparent;
+  border: none;
+  color: white;
+  box-shadow: none;
+  outline: none;
 }
 #login-submit-button:hover {
-    color: rgb(209, 209, 209);
-    box-shadow: none;
+  color: rgb(209, 209, 209);
+  box-shadow: none;
 }
 
 .cancel {
-    float: right;
+  float: right;
 }
 
 .color-inherit {
-    color: inherit;
+  color: inherit;
 }
 
 h1 {
-    margin: 0px 0px 16px 0px;
+  margin: 0px 0px 16px 0px;
 }
 
 h2 {
-    margin: 20px 0 8px 0;
+  margin: 20px 0 8px 0;
 }
 
 p {
-    margin: 0px 0px 16px 0px;
-    color: grey; 
+  margin: 0px 0px 16px 0px;
+  color: grey;
 }
 
 table {
-    border: none;
-    border-collapse: collapse;
-    text-align: left;
-    color: midnightblue;
-    width: 100%;
+  border: none;
+  border-collapse: collapse;
+  text-align: left;
+  color: midnightblue;
+  width: 100%;
 }
 
 .alternating tr:nth-child(even) {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 td {
-    border: none;
-    padding: 5px 20px 5px 0px;
-    width: 1%; /* Fit Content */
-    white-space: nowrap;
+  border: none;
+  padding: 5px 20px 5px 0px;
+  width: 1%; /* Fit Content */
+  white-space: nowrap;
 }
 
 .alternating td {
-    padding: 5px 20px 5px 5px;
+  padding: 5px 20px 5px 5px;
 }
 
-td.stretch { /* To be used on 1 or more columns to define which one(s) stretch. */
-    width: auto;
-    white-space: normal;
+td.stretch {
+  /* To be used on 1 or more columns to define which one(s) stretch. */
+  width: auto;
+  white-space: normal;
 }
 
 .annual-expense-outgoing td {
-    color: rgb(153, 27, 153);
+  color: rgb(153, 27, 153);
 }
 
 .historic-row td,
 .disabled-input,
 .subtext {
-    color: lightgray;
+  color: lightgray;
 }
 
 .future-row td {
-    color: rgb(60, 87, 207);
+  color: rgb(60, 87, 207);
 }
 
 .alert {
-    color: crimson;
+  color: crimson;
 }
 
-input, select {
-    margin: 5px 0px 14px 0px;
-    padding: 3px 5px;
-    border: 0;
-    border-bottom: 1px solid #31507a;
-    outline: none;
+input,
+select {
+  margin: 5px 0px 14px 0px;
+  padding: 3px 5px;
+  border: 0;
+  border-bottom: 1px solid #31507a;
+  outline: none;
 }
 textarea {
-    margin: 5px 0px 14px 0px;
-    padding: 3px 5px;
+  margin: 5px 0px 14px 0px;
+  padding: 3px 5px;
 }
 
 textarea {
-    width: 100%;
-    height: 100px;
+  width: 100%;
+  height: 100px;
 }
 
 .input-label {
-    font-weight: bold;
-    display: block;
+  font-weight: bold;
+  display: block;
 }
 
 .mdi-help-circle-outline {
-    margin: 0 0 0 4px;
-    font-size: 20px;
+  margin: 0 0 0 4px;
+  font-size: 20px;
 }
 
 .section-border {
-    border: 1px solid grey;
-    border-radius: 5px;
-    padding: 8px 8px 0 8px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 8px 8px 0 8px;
 }
 
 .bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .navbar ul {
-    list-style-type: none;
-    position: fixed;
-    width: 250px;
-    height: 100%;
-    top: 0;
-    background: #425979;
-    overflow: hidden;
-    z-index: 1;
+  list-style-type: none;
+  position: fixed;
+  width: 250px;
+  height: 100%;
+  top: 0;
+  background: #425979;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .navbar li a {
-    display: block;
-    color: white;
-    padding: 16px 16px 16px 16px;
-    font-size: 20px;
+  display: block;
+  color: white;
+  padding: 16px 16px 16px 16px;
+  font-size: 20px;
 }
 .navbar li a:hover {
-    color: rgb(199, 199, 199);
+  color: rgb(199, 199, 199);
 }
 .navbar li a.current-page {
-    color: white;
-    background-color: #536e94;
+  color: white;
+  background-color: #536e94;
 }
 
 .navbar ul li:last-child {
-    position: absolute;
-    bottom: 8px;
+  position: absolute;
+  bottom: 8px;
 }
 
 .navbar ul li:nth-last-child(2) {
-    position: absolute;
-    bottom: 64px;
+  position: absolute;
+  bottom: 64px;
 }
 
 .navbar .mdi {
-    margin: 0 10px 0 0;
+  margin: 0 10px 0 0;
 }
 
 .navbar-banner {
-    display: none;
-    background-color: #425979;
-    height: 54px;
-    padding: 10px;
+  display: none;
+  background-color: #425979;
+  height: 54px;
+  padding: 10px;
 }
 .navbar-banner span {
-    width: 100%;
-    padding: 16px 16px 16px 16px;
-    font-size: 30px;
-    color: white;
+  width: 100%;
+  padding: 16px 16px 16px 16px;
+  font-size: 30px;
+  color: white;
 }
 @media screen and (max-aspect-ratio: 8/10), (max-width: 870px) {
-    .navbar-banner {
-        display: block;
-    }
-    .hide-on-mobile {
-        display: none;
-    }
-    .navbar ul {
-        display: none;
-        width: 100%;
-        height: auto;
-        margin: 54px 0 0 0;
-    }
-    .navbar ul li:last-child {
-        position: initial;
-    }
-    .navbar ul li:nth-last-child(2) {
-        position: initial;
-    }
+  .navbar-banner {
+    display: block;
+  }
+  .hide-on-mobile {
+    display: none;
+  }
+  .navbar ul {
+    display: none;
+    width: 100%;
+    height: auto;
+    margin: 54px 0 0 0;
+  }
+  .navbar ul li:last-child {
+    position: initial;
+  }
+  .navbar ul li:nth-last-child(2) {
+    position: initial;
+  }
 }

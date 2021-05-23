@@ -64,11 +64,6 @@
       {% endfor %}
     </select>
     <p>This outgoings value will be updated as and when annual expenses are added or removed.</p>
-
-
-    <h2>Starling Integration</h2>
-    <span class="input-label">API Key</span>
-    <input type="password" name="starling_api_key" value="{{ user.configuration.starling_api_key if user.configuration.starling_api_key }}">
     
     <br>
     <input type="hidden" value="{{ request.args.get('return_page', 'index') }}" name="return_page" />

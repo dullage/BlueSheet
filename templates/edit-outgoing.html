@@ -9,65 +9,36 @@
     <span class="input-label">Account</span>
     <select name="account_id" required>
       {% for account in user.accounts %}
-        <option value="{{ account.id }}" {% if account.id == outgoing.account_id %}selected{% endif %}>{{ account.name }}</option>
+      <option value="{{ account.id }}" {% if account.id==outgoing.account_id %}selected{% endif %}>{{ account.name }}
+      </option>
       {% endfor %}
     </select>
-    
+
     <span class="input-label">Name</span>
     <input type="text" name="name" minlength="1" maxlength="255" value="{{ outgoing.name }}" required>
-    
+
     <span class="input-label">Value</span>
-    £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required
-    {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
-      title="This value cannot be changed as it is linked to your Annual Expenses"
-      readonly
-    {% endif %}>
+    £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required {% if
+      outgoing.id==user.configuration.annual_expense_outgoing_id %}
+      title="This value cannot be changed as it is linked to your Annual Expenses" readonly {% endif %}>
 
     {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
-      <span class="input-label">First Month Paid</span>
-      <input id="start_month" type="month" name="start_month" value="{{ outgoing.start_month_input_string }}"
-        max="{{ outgoing.end_month_input_string }}"
-        onchange="document.getElementById('end_month').min = document.getElementById('start_month').value;">
+    <span class="input-label">First Month Paid</span>
+    <input id="start_month" type="month" name="start_month" value="{{ outgoing.start_month_input_string }}"
+      max="{{ outgoing.end_month_input_string }}"
+      onchange="document.getElementById('end_month').min = document.getElementById('start_month').value;">
 
-      <span class="input-label">Last Month Paid</span>
-      <input id="end_month" type="month" name="end_month" value="{{ outgoing.end_month_input_string }}"
-        min="{{ outgoing.start_month_input_string }}"
-        onchange="document.getElementById('start_month').max = document.getElementById('end_month').value;">
-      
-      <br>
-      <br><input type="checkbox" id="saving_checkbox" onchange="outgoing_saving_checkbox_handle();"
-        {% if outgoing.linked_saving_id %}checked{% endif %}><span class="bold"> Link to Saving</span>
-      <span class="mdi mdi-help-circle-outline color-inherit" title=
-      "Linking a monthly outgoing to a savings account
-      will increase the balance of the savings account
-      by the outgoings value every month.
-      
-      Optionally you can class the outgoing as a self
-      loan to keep track of how much you owe your 
-      savings. Self loans require the outgoing to have
-      a start and an end date."
-      ></span>
-      <div id="saving_checkbox_content" class="section-border" {% if outgoing.linked_saving_id is none %}style="display: none;"{% endif %}>
-
-        <span class="input-label">Saving</span>
-        <select id="saving_id" name="linked_saving_id">
-          <option value=""></option>
-          {% for saving in user.savings %}
-            <option value="{{ saving.id }}" {% if saving.id == outgoing.linked_saving_id %}selected{% endif %}>{{ saving.name }}</option>
-          {% endfor %}
-        </select>
-        <br>
-
-        <input type="checkbox" id="self_loan_checkbox" name="is_self_loan" onchange="self_loan_checkbox_handle();" {% if outgoing.is_self_loan %}checked{% endif %}>
-        <span class="bold"> Self Loan</span>
-      </div>
-      <br>
-      <br>
+    <span class="input-label">Last Month Paid</span>
+    <input id="end_month" type="month" name="end_month" value="{{ outgoing.end_month_input_string }}"
+      min="{{ outgoing.start_month_input_string }}"
+      onchange="document.getElementById('start_month').max = document.getElementById('end_month').value;">
+    <br>
+    <br>
     {% endif %}
-    
+
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ outgoing.notes if outgoing.notes }}</textarea>
-    
+
     <button type="submit">
       <span class="mdi mdi-content-save"></span> Save
     </button>

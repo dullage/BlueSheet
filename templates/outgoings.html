@@ -8,42 +8,30 @@
   <table class="alternating">
     <tbody>
       {% for outgoing in account.outgoings %}
-        <tr {% if outgoing.id == user.configuration.annual_expense_outgoing_id %}
-          class="annual-expense-outgoing" 
-          title="This outgoing is linked to your annual expenses and its value will be updated automatically"
-        {% elif outgoing.is_historic() %}
-          class="historic-row"
-        {% elif outgoing.is_future() %}
-          class="future-row"
-        {% endif %}>
-          <td class="hide-on-mobile">{{ outgoing.id }}</td>
-          <td>
-            {{ outgoing.name }} 
-            {% if outgoing.is_self_loan %}
-              <span class="mdi mdi-hand color-inherit" title="Self Loan from {{ outgoing.linked_saving.name }}"></span>
-            {% elif outgoing.linked_saving_id %}
-              <span class="mdi mdi-coins color-inherit" title="Saving to {{ outgoing.linked_saving.name }}"></span>
-            {% endif %}
-          </td>
-          <td>£{{ "{:,.2f}".format(outgoing.value) }}</td>
-          <td class="stretch hide-on-mobile">
-            {% if outgoing.is_dated %}
-              <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
-            {% endif %}
-            {{ outgoing.notes if outgoing.notes }}
-          </td>
-          <td class="stretch"></td>
-          <td>
-            <a href="{{ url_for('edit_outgoing', outgoing_id=outgoing.id) }}" title="Edit">
-              <span class="mdi mdi-pencil color-inherit"></span>
-            </a>
-          </td>
-          <td class="hide-on-mobile">
-            <a href="#" onclick="delete_warning('outgoing', {{ outgoing.id }}, '{{ outgoing.name }}');" title="Delete">
-              <span class="mdi mdi-delete color-inherit"></span>
-            </a>
-          </td>
-        </tr>
+      <tr {% if outgoing.id==user.configuration.annual_expense_outgoing_id %} class="annual-expense-outgoing"
+        title="This outgoing is linked to your annual expenses and its value will be updated automatically" {% elif
+        outgoing.is_historic() %} class="historic-row" {% elif outgoing.is_future() %} class="future-row" {% endif %}>
+        <td class="hide-on-mobile">{{ outgoing.id }}</td>
+        <td>{{ outgoing.name }}</td>
+        <td>£{{ "{:,.2f}".format(outgoing.value) }}</td>
+        <td class="stretch hide-on-mobile">
+          {% if outgoing.is_dated %}
+          <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
+          {% endif %}
+          {{ outgoing.notes if outgoing.notes }}
+        </td>
+        <td class="stretch"></td>
+        <td>
+          <a href="{{ url_for('edit_outgoing', outgoing_id=outgoing.id) }}" title="Edit">
+            <span class="mdi mdi-pencil color-inherit"></span>
+          </a>
+        </td>
+        <td class="hide-on-mobile">
+          <a href="#" onclick="delete_warning('outgoing', {{ outgoing.id }}, '{{ outgoing.name }}');" title="Delete">
+            <span class="mdi mdi-delete color-inherit"></span>
+          </a>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
