@@ -6,7 +6,7 @@
   <h1>Accounts</h1>
   <table class="alternating">
     <tbody>
-      {% for account in user.accounts %}
+      {% for account in user.accounts  | sort(attribute="name") %}
       <tr>
           <td>{{ account.name }}</td>
           <td class="stretch hide-on-mobile">{{ account.notes if account.notes }}</td>

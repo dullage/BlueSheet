@@ -10,7 +10,7 @@
   <table class="alternating">
     <tbody>
       {% for month_num, month_name in months.items() %}
-        {% for annual_expense in user.annual_expenses %}
+        {% for annual_expense in user.annual_expenses  | sort(attribute="name") %}
           {% if annual_expense.month_paid == month_num %}
           <tr>
             <td>{{ month_name }}</td>

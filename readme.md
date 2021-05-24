@@ -25,6 +25,10 @@ It was designed with the following methodology in mind.
 
 ## Change Log
 
+### 24/05/2021
+
+- Lists are now ordered alphabetically.
+
 ### 23/05/2021
 
 - Removed Starling Bank integration and Savings functionality. I'd like to completely overhaul this project at some point and so removing the functionality I don't use is a start.

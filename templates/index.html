@@ -10,7 +10,7 @@
     <p>On the last day of the month the following amounts need to be transferred into their respective accounts.</p>
     <table>
       <tbody>
-        {% for account in user.accounts %}
+        {% for account in user.accounts  | sort(attribute="name") %}
         <tr title="{{ account.notes if account.notes }}">
           <td class="stretch">{{ account.name }}</td>
           <td>£ {{ "{:,.2f}".format(account.total_outgoings(month_offset=1)) }}</td>
@@ -57,7 +57,7 @@
     {% endif %}
     <table>
       <tbody>
-        {% for annual_expense in annual_expenses %}
+        {% for annual_expense in annual_expenses | sort(attribute="name") %}
           <tr title="{{ annual_expense.notes if annual_expense.notes }}">
             <td class="stretch">{{ annual_expense.name }}</td>
             <td>£ {{ '{:,.2f}'.format(annual_expense.value) }}</td>
