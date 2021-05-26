@@ -593,6 +593,16 @@ env_user()
 
 
 # region Routes
+@app.after_request
+def set_response_headers(response):
+    """Add no-cache headers to every response to prevent the dynamically generated
+    pages from being cached."""
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 # region Login
 @app.route("/login")
 def login():
