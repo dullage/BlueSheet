@@ -26,29 +26,6 @@
   </div>
 
   <div class="grid-item">
-    <h1>Weekly Spending Money</h1>
-    <hr id="weekly-spending-money-outgoings-grid-item">
-    <table>
-      <tbody>
-        <tr>
-          <td class="bold stretch">Set</td>
-          <td class="bold">£ {{ "{:,.2f}".format(user.configuration.weekly_spending_amount) }}</td>
-        </tr>
-        <tr title="Based on next months outgoings. The actual ammount available will go up and down depending on how many pay days are in a given month.">
-          <td class="stretch">
-            Available (Approximate)
-          </td>
-          <td>£ {{ "{:,.2f}".format(((user.salary.annual_net_salary) - (user.total_outgoings(month_offset=1) * 12)) / 52) }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <br>
-    <h2>Future Spending Money Savings</h2>
-    <p>To cover future spending money, savings should currently total:</p>
-    <span class="bold">£{{ "{:,.2f}".format(user.weekly_spending_calculations) }}</span>
-  </div>
-
-  <div class="grid-item">
     <h1>Annual Expenses</h1>
     <hr id="annual-expenses-grid-item">
     {% set annual_expenses = current_month_annual_expenses.all() %}

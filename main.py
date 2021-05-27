@@ -144,30 +144,6 @@ class User(db.Model):
                 total_outgoings += outgoing.value
         return total_outgoings
 
-    @property
-    def weekly_spending_calculations(self):
-        tomorrow = date.today() + relativedelta(days=1)
-
-        # If tommorow is the 1st, calculate as if it were tommorow as the
-        # banking is done today, then add back in the weekly spending amount
-        # that will be paid tomorrow.
-        if tomorrow.day == 1:
-            target = h.spending_money_savings_target_balance(
-                self.configuration.weekly_pay_day,
-                self.configuration.weekly_spending_amount,
-                tomorrow,
-            )
-            if tomorrow.weekday() == self.configuration.weekly_pay_day:
-                target = target + self.configuration.weekly_spending_amount
-        # Else just calculate for today
-        else:
-            target = h.spending_money_savings_target_balance(
-                self.configuration.weekly_pay_day,
-                self.configuration.weekly_spending_amount,
-            )
-
-        return target
-
 
 class Configuration(db.Model):
     __tablename__ = "configuration"
@@ -176,8 +152,6 @@ class Configuration(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
     )
-    weekly_pay_day = db.Column(db.Integer, nullable=False)
-    weekly_spending_amount = db.Column(db.Numeric, nullable=False)
     annual_expense_outgoing_id = db.Column(
         db.Integer, db.ForeignKey("outgoing.id")
     )
@@ -185,13 +159,9 @@ class Configuration(db.Model):
     def __init__(
         self,
         user_id,
-        weekly_pay_day,
-        weekly_spending_amount,
         annual_expense_outgoing_id=None,
     ):
         self.user_id = user_id
-        self.weekly_pay_day = weekly_pay_day
-        self.weekly_spending_amount = weekly_spending_amount
         self.annual_expense_outgoing_id = annual_expense_outgoing_id
 
 
@@ -682,16 +652,10 @@ def configuration_handler():
         db.session.add(
             Configuration(
                 user.id,
-                form_data["weekly_pay_day"],
-                form_data["weekly_spending_amount"],
                 form_data["annual_expense_outgoing_id"],
             )
         )
     else:
-        user.configuration.weekly_pay_day = form_data["weekly_pay_day"]
-        user.configuration.weekly_spending_amount = form_data[
-            "weekly_spending_amount"
-        ]
         user.configuration.annual_expense_outgoing_id = form_data[
             "annual_expense_outgoing_id"
         ]

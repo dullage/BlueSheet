@@ -11,9 +11,8 @@ I was looking for a project to improve my (at the time, non-existent) HTML and C
 
 It was designed with the following methodology in mind.
 
-1. Salary is paid monthly and not used until the end of the month.
-2. On the last day of the month, enough money to cover all monthly outgoings is paid into the account from which they are taken.
-3. The remaining balance (expandable income) is saved and then withdrawn weekly (on the same day every week) throughout the month.
+- Salary is paid monthly and not used until the end of the month.
+- On the last day of the month, enough money to cover all monthly outgoings is paid into the account from which they are taken.
 
 ## Features
 
@@ -24,6 +23,17 @@ It was designed with the following methodology in mind.
 - Mobile Responsive.
 
 ## Change Log
+
+### 27/05/2021
+
+- Removed 'Weekly Spending Money' functionality.
+
+For existing databases, the following database objects can optionally be deleted:
+
+| Object Type | Object Name                          |
+| ----------- | ------------------------------------ |
+| Column      | configuration.weekly_pay_day         |
+| Column      | configuration.weekly_spending_amount |
 
 ### 24/05/2021
 
