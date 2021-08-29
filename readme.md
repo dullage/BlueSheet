@@ -21,6 +21,7 @@ It was designed with the following methodology in mind.
 - Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
 - Multiple User Support - Multiple users can each have their own password protected set of data.
 - Mobile Responsive.
+- Calculate an "Emergency Fund" by specifying the number of months of outgoings you'd like to save for. Individual outgoings can be excluded from the calculation as required.
 
 ## Change Log
 
