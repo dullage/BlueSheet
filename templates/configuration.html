@@ -49,6 +49,12 @@
     </select>
     <p>This outgoings value will be updated as and when annual expenses are added or removed.</p>
 
+    <h2>Emergency Fund</h2>
+    <span class="input-label">Months</span>
+    <input type="number" name="emergency_fund_months" min="0" step="1"
+      value="{{ user.configuration.emergency_fund_months }}" required>
+    <p>The number of months of outgoings you would like to save as an Emergency Fund.</p>
+
     <br>
     <input type="hidden" value="{{ request.args.get('return_page', 'index') }}" name="return_page" />
     <button type="submit">

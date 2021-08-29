@@ -175,6 +175,9 @@ body {
 #annual-expenses-grid-item {
   background-color: rgb(71, 126, 46);
 }
+#emergency-fund-grid-item {
+  background-color: rgb(187, 12, 35);
+}
 
 .input {
   display: table;

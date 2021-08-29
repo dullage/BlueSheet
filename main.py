@@ -144,6 +144,28 @@ class User(db.Model):
                 total_outgoings += outgoing.value
         return total_outgoings
 
+    def emergency_fund_target(self, month_offset=0):
+        """The total outgoings excluding those excluded from the emergency fund."""
+        if (
+            self.configuration.emergency_fund_months is None
+            or self.configuration.emergency_fund_months == 0
+        ):
+            return 0
+        return (
+            sum(
+                [
+                    outgoing.value
+                    for outgoing in self.outgoings
+                    if outgoing.is_current(month_offset=month_offset)
+                    and (
+                        outgoing.emergency_fund_excluded is False
+                        or outgoing.emergency_fund_excluded is None
+                    )
+                ]
+            )
+            * self.configuration.emergency_fund_months
+        )
+
 
 class Configuration(db.Model):
     __tablename__ = "configuration"
@@ -155,14 +177,17 @@ class Configuration(db.Model):
     annual_expense_outgoing_id = db.Column(
         db.Integer, db.ForeignKey("outgoing.id")
     )
+    emergency_fund_months = db.Column(db.Integer)
 
     def __init__(
         self,
         user_id,
         annual_expense_outgoing_id=None,
+        emergency_fund_months=None,
     ):
         self.user_id = user_id
         self.annual_expense_outgoing_id = annual_expense_outgoing_id
+        self.emergency_fund_months = emergency_fund_months
 
 
 class Salary(db.Model):
@@ -275,6 +300,7 @@ class Outgoing(db.Model):
     start_month = db.Column(db.Date)
     end_month = db.Column(db.Date)
     notes = db.Column(db.String)
+    emergency_fund_excluded = db.Column(db.Boolean)
 
     def __init__(
         self,
@@ -285,6 +311,7 @@ class Outgoing(db.Model):
         start_month=None,
         end_month=None,
         notes=None,
+        emergency_fund_excluded=False,
     ):
         self.user_id = user_id
         self.name = name
@@ -293,6 +320,7 @@ class Outgoing(db.Model):
         self.start_month = start_month
         self.end_month = end_month
         self.notes = notes
+        self.emergency_fund_excluded = emergency_fund_excluded
 
     @property
     def start_month_input_string(self):
@@ -646,18 +674,20 @@ def configuration_handler():
 
     form_data = h.empty_strings_to_none(request.form)
 
-    form_data["month_start_date"] = 28  # Hardcode for now.
-
     if user.configuration is None:
         db.session.add(
             Configuration(
                 user.id,
                 form_data["annual_expense_outgoing_id"],
+                emergency_fund_months=form_data["emergency_fund_months"],
             )
         )
     else:
         user.configuration.annual_expense_outgoing_id = form_data[
             "annual_expense_outgoing_id"
+        ]
+        user.configuration.emergency_fund_months = form_data[
+            "emergency_fund_months"
         ]
 
     if user.salary is None:
@@ -767,7 +797,7 @@ def delete_account_handler(account_id):
 # endregion
 
 
-# region Montly Outgoings
+# region Monthly Outgoings
 @app.route("/outgoings")
 @User.login_required
 def outgoings():
@@ -810,6 +840,9 @@ def new_outgoing_handler():
                 form_data["end_month"], set_to_last_day=True
             ),
             notes=form_data["notes"],
+            emergency_fund_excluded=h.checkbox_to_boolean(
+                form_data.get("emergency_fund_excluded")
+            ),
         )
     )
     db.session.commit()
@@ -848,6 +881,9 @@ def edit_outgoing_handler(outgoing_id):
     outgoing.start_month = h.month_input_to_date(form_data.get("start_month"))
     outgoing.end_month = h.month_input_to_date(
         form_data.get("end_month"), set_to_last_day=True
+    )
+    outgoing.emergency_fund_excluded = h.checkbox_to_boolean(
+        form_data.get("emergency_fund_excluded")
     )
     outgoing.notes = form_data["notes"]
 

@@ -85,6 +85,23 @@
         </tbody>
       </table>
     </div>
+
+    {% set emergency_fund_target = user.emergency_fund_target(month_offset=1) %}
+    {% if emergency_fund_target > 0 %}
+    <div class="grid-item">
+      <h1>Emergency Fund</h1>
+      <hr id="emergency-fund-grid-item">
+      <p>Your emergency fund is configured to cover {{ user.configuration.emergency_fund_months }} month(s) of outgoings excluding any marked as 'Exclude from Emergency Fund'.</p>
+      <table>
+        <tbody>       
+          <tr>
+            <td class="bold stretch">Target</td>
+            <td class="bold">£ {{ '{:,.2f}'.format(emergency_fund_target) }}</td>
+          </tr>
+        </tbody>
+      </table>  
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}

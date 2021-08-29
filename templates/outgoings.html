@@ -11,11 +11,14 @@
       <tr {% if outgoing.id==user.configuration.annual_expense_outgoing_id %} class="annual-expense-outgoing"
         title="This outgoing is linked to your annual expenses and its value will be updated automatically" {% elif
         outgoing.is_historic() %} class="historic-row" {% elif outgoing.is_future() %} class="future-row" {% endif %}>
-        <td>
+        <td>  
           {{ outgoing.name }}
           {% if outgoing.is_dated %}
           <span class="mdi mdi-calendar color-inherit" title="{{ outgoing.date_tooltip }}"></span>
           {% endif %}
+          {% if outgoing.emergency_fund_excluded is not none and outgoing.emergency_fund_excluded is true %}
+          <span class="mdi mdi-alarm-light-off-outline color-inherit" title="Excluded from Emergency Fund"></span>
+          {% endif %} 
         </td>
         <td>£{{ "{:,.2f}".format(outgoing.value) }}</td>
         <td class="stretch hide-on-mobile">{{ outgoing.notes if outgoing.notes }}</td>

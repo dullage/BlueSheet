@@ -24,6 +24,17 @@ It was designed with the following methodology in mind.
 
 ## Change Log
 
+### 27/08/2021
+
+- Added ability to calculate an "Emergency Fund".
+
+For existing databases, the following database objects need to be manually added:
+
+| Object Type | Object Name                         | Data Type |
+| ----------- | ----------------------------------- | --------- |
+| Column      | configuration.emergency_fund_months | Integer   |
+| Column      | outgoing.emergency_fund_excluded    | Boolean   |
+
 ### 27/05/2021
 
 - Removed 'Weekly Spending Money' functionality.

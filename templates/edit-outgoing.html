@@ -32,9 +32,13 @@
     <input id="end_month" type="month" name="end_month" value="{{ outgoing.end_month_input_string }}"
       min="{{ outgoing.start_month_input_string }}"
       onchange="document.getElementById('start_month').max = document.getElementById('end_month').value;">
+      {% endif %}
+      
+    <br>
+    <input type="checkbox" name="emergency_fund_excluded" id="emergency_fund_excluded" {% if outgoing.emergency_fund_excluded %}checked{% endif %}>
+    <label for="emergency_fund_excluded">Exclude from Emergency Fund</label>
     <br>
     <br>
-    {% endif %}
 
     <span class="input-label">Notes</span>
     <textarea name="notes">{{ outgoing.notes if outgoing.notes }}</textarea>
