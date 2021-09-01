@@ -25,6 +25,10 @@ It was designed with the following methodology in mind.
 
 ## Change Log
 
+### 01/09/2021
+
+- Fix missing icon in side menu.
+
 ### 27/08/2021
 
 - Added ability to calculate an "Emergency Fund".
