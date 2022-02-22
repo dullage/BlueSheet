@@ -10,13 +10,15 @@
     <p>On the last day of the month the following amounts need to be transferred into their respective accounts.</p>
     <table>
       <tbody>
-        {% for account in user.accounts  | sort(attribute="name") %}
+        {% for account in user.accounts | sort(attribute="name") %}
         <tr title="{{ account.notes if account.notes }}">
           <td class="stretch">{{ account.name }}</td>
           <td>£ {{ "{:,.2f}".format(account.total_outgoings(month_offset=1)) }}</td>
         </tr>
         {% endfor %}
-        <tr><td class="stretch"><br></td></tr>
+        <tr>
+          <td class="stretch"><br></td>
+        </tr>
         <tr>
           <td class="bold stretch">Total Outgoings</td>
           <td class="bold">£ {{ "{:,.2f}".format(user.total_outgoings(month_offset=1)) }}</td>
@@ -30,78 +32,61 @@
     <hr id="annual-expenses-grid-item">
     {% set annual_expenses = current_month_annual_expenses.all() %}
     {% if annual_expenses | length > 0 %}
-      <p>This months annual expenses.</p>
+    <p>This months annual expenses.</p>
     {% endif %}
     <table>
       <tbody>
         {% for annual_expense in annual_expenses | sort(attribute="name") %}
-          <tr title="{{ annual_expense.notes if annual_expense.notes }}">
-            <td class="stretch">{{ annual_expense.name }}</td>
-            <td>£ {{ '{:,.2f}'.format(annual_expense.value) }}</td>
-          </tr>
-        {% endfor %}        
+        <tr title="{{ annual_expense.notes if annual_expense.notes }}">
+          <td class="stretch">{{ annual_expense.name }}</td>
+          <td>£ {{ '{:,.2f}'.format(annual_expense.value) }}</td>
+        </tr>
+        {% endfor %}
         <tr>
           <td class="bold stretch">End of Month Target Balance</td>
           <td class="bold">£ {{ '{:,.2f}'.format(end_of_month_target_balance) }}</td>
         </tr>
       </tbody>
-    </table>  
+    </table>
   </div>
 
+  {% if user.configuration.annual_net_salary %}
   <div class="grid-item">
-      <h1>Monthly Salary</h1>
-      <hr id="monthly-salary-grid-item">
-      <table>
-        <tbody>
-          <tr>
-            <td class="bold stretch">Gross Salary</td>
-            <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_gross_salary / 12) }}</td>
-          </tr>
-          <tr>
-            <td class="stretch">Tax</td>
-            <td>- £ {{ "{:,.2f}".format(user.salary.annual_tax / 12) }}</td>
-          </tr>
-          <tr>
-            <td class="stretch">National Insurance</td>
-            <td>- £ {{ "{:,.2f}".format(user.salary.annual_ni / 12) }}</td>
-          </tr>
-          <tr>
-            <td class="stretch">Pension Contributions</td>
-            <td>- £ {{ "{:,.2f}".format(user.salary.annual_pension / 12) }}</td>
-          </tr>
-          <tr>
-            <td class="stretch">Pension Tax Relief</td>
-            <td>+ £ {{ "{:,.2f}".format(user.salary.annual_pension_tax_relief / 12) }}</td>
-          </tr>
-          <tr><td class="stretch"><br></td></tr>
-          <tr>
-            <td class="bold stretch">Net Salary</td>
-            <td class="bold">£ {{ "{:,.2f}".format(user.salary.annual_net_salary / 12) }}</td>
-          </tr>
-          <tr>
-            <td class="bold stretch" title="Based on next months outgoings">After Outgoings</td>
-            <td class="bold">£ {{ "{:,.2f}".format((user.salary.annual_net_salary / 12) - user.total_outgoings(month_offset=1)) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <h1>Monthly Salary</h1>
+    <hr id="monthly-salary-grid-item">
+    <table>
+      <tbody>
+        <tr>
+          <td class="bold stretch">Net Salary</td>
+          <td class="bold">£ {{ "{:,.2f}".format(user.configuration.annual_net_salary / 12) }}</td>
+        </tr>
+        <tr>
+          <td class="bold stretch" title="Based on next months outgoings">After Outgoings</td>
+          <td class="bold">£ {{ "{:,.2f}".format((user.configuration.annual_net_salary / 12) -
+            user.total_outgoings(month_offset=1)) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 
-    {% set emergency_fund_target = user.emergency_fund_target(month_offset=1) %}
-    {% if emergency_fund_target > 0 %}
-    <div class="grid-item">
-      <h1>Emergency Fund</h1>
-      <hr id="emergency-fund-grid-item">
-      <p>Your emergency fund is configured to cover {{ user.configuration.emergency_fund_months }} month(s) of outgoings excluding any marked as 'Exclude from Emergency Fund'.</p>
-      <table>
-        <tbody>       
-          <tr>
-            <td class="bold stretch">Target</td>
-            <td class="bold">£ {{ '{:,.2f}'.format(emergency_fund_target) }}</td>
-          </tr>
-        </tbody>
-      </table>  
-    </div>
-    {% endif %}
+  {% set emergency_fund_target = user.emergency_fund_target(month_offset=1) %}
+  {% if emergency_fund_target > 0 %}
+  <div class="grid-item">
+    <h1>Emergency Fund</h1>
+    <hr id="emergency-fund-grid-item">
+    <p>Your emergency fund is configured to cover {{ user.configuration.emergency_fund_months }} month(s) of outgoings
+      excluding any marked as 'Exclude from Emergency Fund'.</p>
+    <table>
+      <tbody>
+        <tr>
+          <td class="bold stretch">Target</td>
+          <td class="bold">£ {{ '{:,.2f}'.format(emergency_fund_target) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 </div>
 
 {% endblock %}

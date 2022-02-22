@@ -25,6 +25,22 @@ It was designed with the following methodology in mind.
 
 ## Change Log
 
+### 22/02/2022
+
+- Removed salary calculator. Configuration now simply requires net salary input.
+
+For existing databases, the following database objects need to be manually added:
+
+| Object Type | Object Name              | Data Type |
+| ----------- | ------------------------ | --------- |
+| Column      | configuration.net_salary | Number    |
+
+For existing databases, the following database objects can optionally be deleted:
+
+| Object Type | Object Name |
+| ----------- | ----------- |
+| Table       | salary      |
+
 ### 01/09/2021
 
 - Fix missing icon in side menu.

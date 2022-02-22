@@ -54,9 +54,6 @@ class User(db.Model):
     configuration = db.relationship(
         "Configuration", backref="user", uselist=False, lazy=True
     )
-    salary = db.relationship(
-        "Salary", backref="user", uselist=False, lazy=True
-    )
     accounts = db.relationship("Account", backref="user", lazy=True)
     outgoings = db.relationship("Outgoing", backref="user", lazy=True)
     annual_expenses = db.relationship(
@@ -178,84 +175,19 @@ class Configuration(db.Model):
         db.Integer, db.ForeignKey("outgoing.id")
     )
     emergency_fund_months = db.Column(db.Integer)
+    annual_net_salary = db.Column(db.Numeric)
 
     def __init__(
         self,
         user_id,
         annual_expense_outgoing_id=None,
         emergency_fund_months=None,
+        annual_net_salary=None,
     ):
         self.user_id = user_id
         self.annual_expense_outgoing_id = annual_expense_outgoing_id
         self.emergency_fund_months = emergency_fund_months
-
-
-class Salary(db.Model):
-    __tablename__ = "salary"
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
-    )
-    annual_gross_salary = db.Column(db.Numeric, nullable=False)
-    annual_tax_allowance = db.Column(db.Numeric, nullable=False)
-    tax_rate = db.Column(db.Numeric, nullable=False)
-    annual_ni_allowance = db.Column(db.Numeric, nullable=False)
-    ni_rate = db.Column(db.Numeric, nullable=False)
-    annual_non_pensionable_value = db.Column(db.Numeric, nullable=False)
-    pension_contribution = db.Column(db.Numeric, nullable=False)
-
-    def __init__(
-        self,
-        user_id,
-        annual_gross_salary,
-        annual_tax_allowance,
-        tax_rate,
-        annual_ni_allowance,
-        ni_rate,
-        annual_non_pensionable_value,
-        pension_contribution,
-    ):
-        self.user_id = user_id
-        self.annual_gross_salary = annual_gross_salary
-        self.annual_tax_allowance = annual_tax_allowance
-        self.tax_rate = tax_rate
-        self.annual_ni_allowance = annual_ni_allowance
-        self.ni_rate = ni_rate
-        self.annual_non_pensionable_value = annual_non_pensionable_value
-        self.pension_contribution = pension_contribution
-
-    @property
-    def annual_tax(self):
-        return (self.annual_gross_salary - self.annual_tax_allowance) * (
-            self.tax_rate / 100
-        )
-
-    @property
-    def annual_ni(self):
-        return (self.annual_gross_salary - self.annual_ni_allowance) * (
-            self.ni_rate / 100
-        )
-
-    @property
-    def annual_pension(self):
-        return (
-            self.annual_gross_salary - self.annual_non_pensionable_value
-        ) * (self.pension_contribution / 100)
-
-    @property
-    def annual_pension_tax_relief(self):
-        return self.annual_pension * (self.tax_rate / 100)
-
-    @property
-    def annual_net_salary(self):
-        return (
-            self.annual_gross_salary
-            - self.annual_tax
-            - self.annual_ni
-            - self.annual_pension
-            + self.annual_pension_tax_relief
-        )
+        self.annual_net_salary = annual_net_salary
 
 
 class Account(db.Model):
@@ -680,6 +612,7 @@ def configuration_handler():
                 user.id,
                 form_data["annual_expense_outgoing_id"],
                 emergency_fund_months=form_data["emergency_fund_months"],
+                annual_net_salary=form_data["annual_net_salary"],
             )
         )
     else:
@@ -689,30 +622,7 @@ def configuration_handler():
         user.configuration.emergency_fund_months = form_data[
             "emergency_fund_months"
         ]
-
-    if user.salary is None:
-        db.session.add(
-            Salary(
-                user.id,
-                form_data["annual_gross_salary"],
-                form_data["annual_tax_allowance"],
-                form_data["tax_rate"],
-                form_data["annual_ni_allowance"],
-                form_data["ni_rate"],
-                form_data["annual_non_pensionable_value"],
-                form_data["pension_contribution"],
-            )
-        )
-    else:
-        user.salary.annual_gross_salary = form_data["annual_gross_salary"]
-        user.salary.annual_tax_allowance = form_data["annual_tax_allowance"]
-        user.salary.tax_rate = form_data["tax_rate"]
-        user.salary.annual_ni_allowance = form_data["annual_ni_allowance"]
-        user.salary.ni_rate = form_data["ni_rate"]
-        user.salary.annual_non_pensionable_value = form_data[
-            "annual_non_pensionable_value"
-        ]
-        user.salary.pension_contribution = form_data["pension_contribution"]
+        user.configuration.annual_net_salary = form_data["annual_net_salary"]
 
     db.session.commit()
 
