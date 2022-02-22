@@ -19,10 +19,10 @@
 
     <span class="input-label">Value</span>
     £ <input type="number" name="value" step="0.01" min="0" value="{{ '{:.2f}'.format(outgoing.value) }}" required {% if
-      outgoing.id==user.configuration.annual_expense_outgoing_id %}
+      user.configuration and outgoing.id==user.configuration.annual_expense_outgoing_id %}
       title="This value cannot be changed as it is linked to your Annual Expenses" readonly {% endif %}>
 
-    {% if outgoing.id != user.configuration.annual_expense_outgoing_id %}
+    {% if user.configuration and outgoing.id != user.configuration.annual_expense_outgoing_id %}
     <span class="input-label">First Month Paid</span>
     <input id="start_month" type="month" name="start_month" value="{{ outgoing.start_month_input_string }}"
       max="{{ outgoing.end_month_input_string }}"
@@ -32,10 +32,11 @@
     <input id="end_month" type="month" name="end_month" value="{{ outgoing.end_month_input_string }}"
       min="{{ outgoing.start_month_input_string }}"
       onchange="document.getElementById('start_month').max = document.getElementById('end_month').value;">
-      {% endif %}
-      
+    {% endif %}
+
     <br>
-    <input type="checkbox" name="emergency_fund_excluded" id="emergency_fund_excluded" {% if outgoing.emergency_fund_excluded %}checked{% endif %}>
+    <input type="checkbox" name="emergency_fund_excluded" id="emergency_fund_excluded" {% if
+      outgoing.emergency_fund_excluded %}checked{% endif %}>
     <label for="emergency_fund_excluded">Exclude from Emergency Fund</label>
     <br>
     <br>

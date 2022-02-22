@@ -28,6 +28,7 @@ It was designed with the following methodology in mind.
 ### 22/02/2022
 
 - Removed salary calculator. Configuration now simply requires net salary input.
+- Configuration is no longer mandatory.
 
 For existing databases, the following database objects need to be manually added:
 

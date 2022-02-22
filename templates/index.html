@@ -50,7 +50,7 @@
     </table>
   </div>
 
-  {% if user.configuration.annual_net_salary %}
+  {% if user.configuration and user.configuration.annual_net_salary %}
   <div class="grid-item">
     <h1>Monthly Salary</h1>
     <hr id="monthly-salary-grid-item">

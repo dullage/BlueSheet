@@ -144,7 +144,8 @@ class User(db.Model):
     def emergency_fund_target(self, month_offset=0):
         """The total outgoings excluding those excluded from the emergency fund."""
         if (
-            self.configuration.emergency_fund_months is None
+            self.configuration is None
+            or self.configuration.emergency_fund_months is None
             or self.configuration.emergency_fund_months == 0
         ):
             return 0
@@ -478,10 +479,13 @@ class AnnualExpense(db.Model):
 
     @classmethod
     def update_user_annual_expense_outgoing(cls, user):
-        outgoing_id = user.configuration.annual_expense_outgoing_id
+        if user.configuration is None:
+            return
 
+        outgoing_id = user.configuration.annual_expense_outgoing_id
         if outgoing_id is None:
             return
+
         else:
             for outgoing in user.outgoings:
                 if outgoing.id == outgoing_id:
