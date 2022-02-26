@@ -18,7 +18,6 @@ It was designed with the following methodology in mind.
 
 - Track monthly outgoings and ensure enough money is saved to cover them all.
 - Record and save for Annual Expenses - Link a monthly outgoing to your annual expenses so that the money is saved and ready when needed.
-- Salary Calculation (UK) - Calculate net salary and see tax, NI and pension breakdown.
 - Multiple User Support - Multiple users can each have their own password protected set of data.
 - Mobile Responsive.
 - Calculate an "Emergency Fund" by specifying the number of months of outgoings you'd like to save for. Individual outgoings can be excluded from the calculation as required.
